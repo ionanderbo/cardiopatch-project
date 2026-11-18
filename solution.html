@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Health 4.0 Solution & Architecture · CardioPatch 4.0</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <div id="site-header"></div>
+
+    <!-- Hero Band -->
+    <section class="band band--crimson">
+      <div class="radial-rings"></div>
+      <div style="position:relative;z-index:2;">
+        <span class="eyebrow eyebrow--light">Chapter 3 · Proposal of Health 4.0 Approach</span>
+        <h1 class="display-hero" style="margin-top:16px;">
+          Six integrated <span class="serif-italic">Health 4.0</span> pillars from chest to cloud.
+        </h1>
+        <p style="margin-top:16px;max-width:740px;font-size:1.05rem;opacity:0.92;">
+          Full evaluation of all 8 eVIDA Health 4.0 technological areas, end-to-end telemetry architecture, modular IP67 hardware specifications, and GDPR-compliant cloud triage workflow.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 3.2: Interactive 5-Stage End-to-End Architecture Diagram -->
+    <section class="band band--alabaster two-tone-sweep">
+      <span class="eyebrow">Section 3.2 · System Architecture (Figure 1)</span>
+      <h2 class="display-section" style="margin:12px 0 22px;">End-to-End Telemetry &amp; Edge AI Pipeline</h2>
+
+      <div class="grid-4 focus-zoom-group">
+        <div class="card card-wipe focus-zoom-frame" style="background:#fff;">
+          <span class="badge badge--alert">01 · Biosensing Hub</span>
+          <h3 style="margin-top:12px;">ECG + Skin Temp</h3>
+          <p style="font-size:0.9rem;color:var(--ink-secondary);margin-top:8px;">250 Hz single-lead ECG front-end + NTC skin thermistor inside a 3D-printed IP67 reusable hub with disposable hypoallergenic silicone patch.</p>
+        </div>
+        <div class="card card-wipe focus-zoom-frame" style="background:#fff;">
+          <span class="badge badge--alert">02 · Edge AI Filter</span>
+          <h3 style="margin-top:12px;">2-Tier Classification</h3>
+          <p style="font-size:0.9rem;color:var(--ink-secondary);margin-top:8px;">Bandpass filtering (0.5–40 Hz) + lightweight TinyML model separating benign sinus tachycardia from ST-segment &amp; HRV anomalies.</p>
+        </div>
+        <div class="card card-wipe focus-zoom-frame" style="background:#fff;">
+          <span class="badge badge--alert">03 · Encrypted IoT</span>
+          <h3 style="margin-top:12px;">BLE 5.0 → TLS 1.3</h3>
+          <p style="font-size:0.9rem;color:var(--ink-secondary);margin-top:8px;">24h local flash ring-buffer prevents rural data loss; transmits 30s pre/post-event ECG strips via AES-256 / TLS 1.3.</p>
+        </div>
+        <div class="card card-wipe focus-zoom-frame" style="background:#fff;">
+          <span class="badge badge--alert">04 · Clinical Cloud</span>
+          <h3 style="margin-top:12px;">EHR &amp; Triage Portal</h3>
+          <p style="font-size:0.9rem;color:var(--ink-secondary);margin-top:8px;">EU-hosted HL7 FHIR-ready dashboard delivering daily summaries and prioritized Tier-1 alerts to cardiologists.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3.1: All 8 Health 4.0 Technological Areas Review -->
+    <section class="band band--sand two-tone-sweep">
+      <span class="eyebrow">Section 3.1 · Mandatory 8-Area Evaluation (Table 4 &amp; Table 5)</span>
+      <h2 class="display-section" style="margin:12px 0 20px;">Review of All 8 Health 4.0 Technological Areas</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Health 4.0 Technological Area</th><th>Used?</th><th>Justification &amp; Role in CardioPatch 4.0</th></tr>
+          </thead>
+          <tbody id="health40Body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Annex C: Component Datasheet Summary -->
+    <section class="band band--mist two-tone-sweep">
+      <span class="eyebrow">Annex C · Hardware &amp; Cloud Specifications</span>
+      <h2 class="display-section" style="margin:12px 0 20px;">Prototype Bill of Materials &amp; Datasheet Slots</h2>
+      <div class="grid-2 focus-zoom-group">
+        <div class="card card-wipe focus-zoom-frame" style="background:#fff;">
+          <h3>C.1 CardioPatch Wearable Sensor Hub</h3>
+          <ul style="margin-top:12px;padding-left:18px;font-size:0.92rem;color:var(--ink-secondary);display:grid;gap:6px;">
+            <li><strong>Biopotential Front-End:</strong> AD8232 / MAX30003 single-lead ECG (250 Hz sampling)</li>
+            <li><strong>Thermal Sensor:</strong> Medical-grade NTC thermistor (±0.1 °C accuracy)</li>
+            <li><strong>Protection &amp; Adhesion:</strong> IP67 water-resistant + disposable breathable silicone hydrogel</li>
+            <li><strong>Connectivity &amp; Battery:</strong> BLE 5.0 · 7-day rechargeable LiPo + 24h offline flash buffer</li>
+          </ul>
+        </div>
+        <div class="card card-wipe focus-zoom-frame" style="background:#fff;">
+          <h3>C.2 CardioCloud Clinical Triage Platform</h3>
+          <ul style="margin-top:12px;padding-left:18px;font-size:0.92rem;color:var(--ink-secondary);display:grid;gap:6px;">
+            <li><strong>Hosting &amp; Compliance:</strong> EU-sovereign cloud servers · GDPR pseudonymization</li>
+            <li><strong>Security:</strong> TLS 1.3 transport encryption, AES-256 storage, RBAC clinician auth</li>
+            <li><strong>Interoperability:</strong> HL7 FHIR REST API for hospital EHR integration</li>
+            <li><strong>Alert Payload:</strong> Summarized daily HRV/temp report + 30s pre/post-event ECG strips</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div id="site-footer"></div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/shared.js"></script>
+  <script src="js/widgets.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("health40Body").innerHTML = PROJECT_DATA.health40Areas.map((h) => `
+        <tr>
+          <td><strong>${h.area}</strong></td>
+          <td><span class="badge ${h.used ? "badge--yes" : "badge--no"}">${h.used ? "Yes · Active" : "No · Excluded"}</span></td>
+          <td>${h.role}</td>
+        </tr>
+      `).join("");
+    });
+  </script>
+</body>
+</html>

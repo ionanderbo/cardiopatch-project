@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Work Plan & Risk Analysis · CardioPatch 4.0</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <div id="site-header"></div>
+
+    <!-- Hero -->
+    <section class="band band--crimson">
+      <div class="radial-rings"></div>
+      <div style="position:relative;z-index:2;">
+        <span class="eyebrow eyebrow--light">Chapter 4 · Work Plan &amp; Risk Governance</span>
+        <h1 class="display-hero" style="margin-top:16px;">
+          12-week engineering <span class="serif-italic">roadmap</span> &amp; mitigation matrix.
+        </h1>
+        <p style="margin-top:16px;max-width:720px;font-size:1.05rem;opacity:0.92;">
+          Synchronized with the 5 stages of the Introduction to Biomedical Engineering Final Project guidelines—leading to final submission (01/11/2026) and oral defense (19–20 Nov).
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 4.1: Filterable Gantt Diagram -->
+    <section class="band band--alabaster two-tone-sweep">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:20px;">
+        <div>
+          <span class="eyebrow">Section 4.1 · Gantt Diagram (Figure 2)</span>
+          <h2 class="display-section" style="margin-top:10px;">Milestones, Owners &amp; Stage Dependencies</h2>
+        </div>
+        <div class="preset-pills">
+          <button class="preset-btn active" data-gantt-filter="All">All Tasks</button>
+          <button class="preset-btn" data-gantt-filter="Done">Done</button>
+          <button class="preset-btn" data-gantt-filter="In Progress">In Progress</button>
+          <button class="preset-btn" data-gantt-filter="Planned">Planned</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Weeks</th><th>Project Stage</th><th>Responsible</th><th>Deliverable &amp; Activities</th><th>Status</th></tr>
+          </thead>
+          <tbody id="ganttBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 4.2: Risk Analysis Matrix -->
+    <section class="band band--sand two-tone-sweep">
+      <span class="eyebrow">Section 4.2 · Risk Analysis (Table 8)</span>
+      <h2 class="display-section" style="margin:12px 0 20px;">Technical, Clinical &amp; Usability Risk Mitigations</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Identified Risk</th><th>Probability</th><th>Impact</th><th>Engineering &amp; Clinical Mitigation Measure</th></tr>
+          </thead>
+          <tbody id="riskBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div id="site-footer"></div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/shared.js"></script>
+  <script src="js/widgets.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("riskBody").innerHTML = PROJECT_DATA.risks.map((r) => `
+        <tr>
+          <td><strong>${r.risk}</strong></td>
+          <td><span class="badge badge--todo">${r.prob}</span></td>
+          <td><span class="badge badge--alert">${r.impact}</span></td>
+          <td>${r.mitigation}</td>
+        </tr>
+      `).join("");
+    });
+  </script>
+</body>
+</html>

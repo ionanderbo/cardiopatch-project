@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team, Conclusions & Annexes · CardioPatch 4.0</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <div id="site-header"></div>
+
+    <!-- Hero -->
+    <section class="band band--obsidian">
+      <span class="eyebrow eyebrow--light">Chapter 5 &amp; Annexes · Group 06 · Faculty of Engineering</span>
+      <h1 class="display-hero" style="margin-top:16px;">
+        Built by <span class="serif-italic">Group 06</span> for Competence SC3.
+      </h1>
+      <p style="margin-top:16px;max-width:740px;font-size:1.05rem;opacity:0.86;">
+        Team roles, technical &amp; personal conclusions, Annex A meeting log, and a built-in 10-minute rehearsal timer for Part A.2 Oral Exam.
+      </p>
+    </section>
+
+    <!-- Group 06 Roster -->
+    <section class="band band--alabaster two-tone-sweep">
+      <span class="eyebrow">Group 06 Members</span>
+      <h2 class="display-section" style="margin:12px 0 22px;">Authors &amp; Individual Contributions</h2>
+      <div class="grid-2 focus-zoom-group" id="teamGrid"></div>
+    </section>
+
+    <!-- Part A.2 Oral Exam 10-Minute Rehearsal Timer + Chapter 5 Conclusions -->
+    <section class="band band--sand two-tone-sweep">
+      <div class="split-2">
+        <div class="card" style="background:#ffffff;">
+          <span class="eyebrow">Part A.2 · Oral Exam Rehearsal (Max 10:00)</span>
+          <div id="oralTimerDisplay" style="font-family:var(--font-mono);font-size:3.2rem;font-weight:700;margin:14px 0;color:var(--accent-crimson);">10:00</div>
+          <p style="font-size:0.9rem;color:var(--ink-secondary);margin-bottom:16px;">
+            Guidelines Sec. 4.1–4.3: 10-minute group pitch (2.5 min/member), max 20 slides, live webpage demo link, and Unit 1 Health 4.0 Q&amp;A.
+          </p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button id="oralStartBtn" class="btn-roll btn-roll--crimson btn-wipe">
+              <span class="roll-track"><span>Start 10:00 Pitch</span><span>Start 10:00 Pitch →</span></span>
+            </button>
+            <button id="oralResetBtn" class="btn-roll btn-roll--outline btn-wipe">
+              <span class="roll-track"><span>Reset</span><span>Reset</span></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="card" style="background:#ffffff;">
+          <span class="eyebrow">Chapter 5 · Conclusions</span>
+          <h3 style="margin-top:12px;">5.1 Technical Conclusions</h3>
+          <p style="font-size:0.92rem;color:var(--ink-secondary);margin-top:6px;">
+            CardioPatch 4.0 bridges the outpatient diagnostic gap between intermittent clinic ECGs and acute emergency care by fusing continuous ECG + skin thermometry with two-tier Edge AI and calm D4ALL escalation. Future work focuses on clinical multi-center validation and CE Class IIa regulatory pathways.
+          </p>
+          <h3 style="margin-top:14px;">5.2 Personal Conclusions</h3>
+          <p style="font-size:0.92rem;color:var(--ink-secondary);margin-top:6px;">
+            <span class="badge badge--todo">Slot Ready</span> Co-designing with Dr. Azpeitia, Mikel, Javier, and Carmen taught our team that preventing alarm fatigue and patient anxiety is just as critical as sensor accuracy.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div id="site-footer"></div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/shared.js"></script>
+  <script src="js/widgets.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("teamGrid").innerHTML = PROJECT_DATA.team.map((m) => `
+        <article class="card card-wipe focus-zoom-frame" style="background:#ffffff;">
+          <span class="badge badge--no">ID: ${m.id}</span>
+          <h3 style="margin-top:12px;font-size:1.3rem;">${m.name}</h3>
+          <p style="font-size:0.88rem;font-weight:700;color:var(--accent-crimson);margin-top:4px;">${m.role}</p>
+          <p style="font-size:0.92rem;color:var(--ink-secondary);margin-top:10px;">${m.focus}</p>
+        </article>
+      `).join("");
+    });
+  </script>
+</body>
+</html>
