@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Team, Conclusions & Annexes · CardioPatch 4.0</title>
+  <title>Conclusions, References & Annexes · CardioPatch 4.0</title>
   <link rel="stylesheet" href="./styles.css" />
   <link rel="stylesheet" href="./animations.css" />
 </head>
@@ -13,52 +13,54 @@
 
     <!-- Hero -->
     <section class="band band--obsidian">
-      <span class="eyebrow eyebrow--light">Chapter 5 &amp; Annexes · Group 06 · Faculty of Engineering</span>
+      <span class="eyebrow eyebrow--light">Chapter 5, References &amp; Annexes · Group 06</span>
       <h1 class="display-hero" style="margin-top:16px;">
-        Built by <span class="serif-italic">Group 06</span> for Competence SC3.
+        Project <span class="serif-italic">conclusions</span>, scientific references &amp; annexes.
       </h1>
       <p style="margin-top:16px;max-width:740px;font-size:1.05rem;opacity:0.86;">
-        Team roles, technical &amp; personal conclusions, Annex A meeting log, and a built-in 10-minute rehearsal timer for Part A.2 Oral Exam.
+        Technical outcomes, human-centered engineering lessons, numbered bibliography, and supporting documentation (Annexes A, B, and C) for Competence SC3.
       </p>
     </section>
 
-    <!-- Group 06 Roster -->
+    <!-- Chapter 5: Technical & Personal Conclusions -->
     <section class="band band--alabaster two-tone-sweep">
-      <span class="eyebrow">Group 06 Members</span>
-      <h2 class="display-section" style="margin:12px 0 22px;">Authors &amp; Individual Contributions</h2>
-      <div class="grid-2 focus-zoom-group" id="teamGrid"></div>
+      <span class="eyebrow">Chapter 5 · Conclusions</span>
+      <h2 class="display-section" style="margin:12px 0 22px;">Technical Outcomes &amp; Group Reflections</h2>
+      <div class="grid-2 focus-zoom-group">
+        <article class="card card-wipe focus-zoom-frame" style="background:#ffffff;">
+          <span class="badge badge--yes">Section 5.1 · Technical Conclusions</span>
+          <h3 style="margin-top:12px;font-size:1.35rem;">Bridging the Outpatient Diagnostic Gap</h3>
+          <p style="font-size:0.94rem;color:var(--ink-secondary);margin-top:10px;">
+            CardioPatch 4.0 integrates continuous single-lead ECG and skin thermometry inside an IP67 breathable chest patch with two-tier Edge AI and a decoupled 3-tier Django/Docker cloud platform. By filtering benign exertion locally and transmitting 30-second pre/post-event strips, the system addresses the 45% silent myocardial infarction gap while preventing clinical alarm fatigue.
+          </p>
+          <p style="font-size:0.9rem;color:var(--ink-muted);margin-top:10px;">
+            <strong>Limitations &amp; Future Work:</strong> The current prototype serves strictly as an early-warning clinical decision-support aid; clinical multi-center trials and CE Class IIa medical device certification remain essential next steps.
+          </p>
+        </article>
+
+        <article class="card card-wipe focus-zoom-frame" style="background:#ffffff;">
+          <span class="badge badge--alert">Section 5.2 · Personal Conclusions</span>
+          <h3 style="margin-top:12px;font-size:1.35rem;">Co-Designing Around Human Behavior</h3>
+          <p style="font-size:0.94rem;color:var(--ink-secondary);margin-top:10px;">
+            Developing this Health 4.0 solution taught Group 06 that hardware sensitivity alone cannot save lives if clinicians disable noisy alerts or anxious patients remove uncomfortable sensors. Semi-structured interviews with Dr. Jon Azpeitia, Mikel Unanue, Javier Mendizabal, and Carmen Mendizabal reshaped every layer of our engineering—from IP67 silicone adhesion to the calm D4ALL patient interface and 3-step caregiver escalation tree.
+          </p>
+        </article>
+      </div>
     </section>
 
-    <!-- Part A.2 Oral Exam 10-Minute Rehearsal Timer + Chapter 5 Conclusions -->
+    <!-- Annexes A, B & C -->
     <section class="band band--sand two-tone-sweep">
-      <div class="split-2">
-        <div class="card" style="background:#ffffff;">
-          <span class="eyebrow">Part A.2 · Oral Exam Rehearsal (Max 10:00)</span>
-          <div id="oralTimerDisplay" style="font-family:var(--font-mono);font-size:3.2rem;font-weight:700;margin:14px 0;color:var(--accent-crimson);">10:00</div>
-          <p style="font-size:0.9rem;color:var(--ink-secondary);margin-bottom:16px;">
-            Guidelines Sec. 4.1–4.3: 10-minute group pitch (2.5 min/member), max 20 slides, live webpage demo link, and Unit 1 Health 4.0 Q&amp;A.
-          </p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button id="oralStartBtn" class="btn-roll btn-roll--crimson btn-wipe">
-              <span class="roll-track"><span>Start 10:00 Pitch</span><span>Start 10:00 Pitch →</span></span>
-            </button>
-            <button id="oralResetBtn" class="btn-roll btn-roll--outline btn-wipe">
-              <span class="roll-track"><span>Reset</span><span>Reset</span></span>
-            </button>
-          </div>
-        </div>
+      <span class="eyebrow">Supporting Documentation · Annexes</span>
+      <h2 class="display-section" style="margin:12px 0 22px;">Project Annexes (A, B &amp; C)</h2>
+      <div class="grid-3 focus-zoom-group" id="annexGrid"></div>
+    </section>
 
-        <div class="card" style="background:#ffffff;">
-          <span class="eyebrow">Chapter 5 · Conclusions</span>
-          <h3 style="margin-top:12px;">5.1 Technical Conclusions</h3>
-          <p style="font-size:0.92rem;color:var(--ink-secondary);margin-top:6px;">
-            CardioPatch 4.0 bridges the outpatient diagnostic gap between intermittent clinic ECGs and acute emergency care by fusing continuous ECG + skin thermometry with two-tier Edge AI and calm D4ALL escalation. Future work focuses on clinical multi-center validation and CE Class IIa regulatory pathways.
-          </p>
-          <h3 style="margin-top:14px;">5.2 Personal Conclusions</h3>
-          <p style="font-size:0.92rem;color:var(--ink-secondary);margin-top:6px;">
-            <span class="badge badge--todo">Slot Ready</span> Co-designing with Dr. Azpeitia, Mikel, Javier, and Carmen taught our team that preventing alarm fatigue and patient anxiety is just as critical as sensor accuracy.
-          </p>
-        </div>
+    <!-- References List -->
+    <section class="band band--mist two-tone-sweep">
+      <span class="eyebrow">Bibliography · Annex B.1 Format</span>
+      <h2 class="display-section" style="margin:12px 0 20px;">Scientific &amp; Institutional References</h2>
+      <div class="card" style="background:#ffffff;">
+        <ul id="referencesList" style="list-style:none;display:grid;gap:10px;font-size:0.9rem;color:var(--ink-secondary);"></ul>
       </div>
     </section>
 
@@ -70,13 +72,16 @@
   <script src="./widgets.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("teamGrid").innerHTML = PROJECT_DATA.team.map((m) => `
+      document.getElementById("annexGrid").innerHTML = PROJECT_DATA.annexes.map((a) => `
         <article class="card card-wipe focus-zoom-frame" style="background:#ffffff;">
-          <span class="badge badge--no">ID: ${m.id}</span>
-          <h3 style="margin-top:12px;font-size:1.3rem;">${m.name}</h3>
-          <p style="font-size:0.88rem;font-weight:700;color:var(--accent-crimson);margin-top:4px;">${m.role}</p>
-          <p style="font-size:0.92rem;color:var(--ink-secondary);margin-top:10px;">${m.focus}</p>
+          <span class="badge badge--no">${a.code}</span>
+          <h3 style="margin-top:12px;font-size:1.25rem;">${a.title}</h3>
+          <p style="font-size:0.92rem;color:var(--ink-secondary);margin-top:10px;">${a.detail}</p>
         </article>
+      `).join("");
+
+      document.getElementById("referencesList").innerHTML = PROJECT_DATA.references.map((ref) => `
+        <li style="padding-bottom:8px;border-bottom:1px solid var(--border-subtle);">${ref}</li>
       `).join("");
     });
   </script>

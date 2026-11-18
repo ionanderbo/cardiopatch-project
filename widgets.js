@@ -11,7 +11,7 @@ function initTelemetryPlayer() {
   const presets = {
     normal: { bpm: 68, temp: "36.6 °C", status: "Normal Sinus Rhythm · Edge AI Tier 0 (Logged Silently)", stShift: 0, color: "#246a59" },
     silent: { bpm: 104, temp: "35.8 °C", status: "Silent ST-Depression + Cool Diaphoresis · Tier 1 Alert!", stShift: 16, color: "#b8293d" },
-    burst: { bpm: 118, temp: "35.6 °C", status: "30s Pre/Post ECG Strip Dispatched to Cardiology Cloud", stShift: 22, color: "#e04f5f" }
+    burst: { bpm: 118, temp: "35.6 °C", status: "30s Pre/Post ECG Strip Dispatched to Django REST Cloud", stShift: 22, color: "#e04f5f" }
   };
 
   let currentMode = "normal";
@@ -46,12 +46,12 @@ function initTelemetryPlayer() {
 
   function ecgSample(t, stShift) {
     const x = t % 1;
-    if (x > 0.12 && x < 0.2) return -6 * Math.sin(((x - 0.12) / 0.08) * Math.PI); // P wave
-    if (x >= 0.26 && x < 0.29) return 10; // Q
-    if (x >= 0.29 && x < 0.33) return -34; // R peak
-    if (x >= 0.33 && x < 0.37) return 14 + stShift; // S + ST depression
-    if (x >= 0.37 && x < 0.46) return stShift * 0.85; // ST segment
-    if (x >= 0.48 && x < 0.62) return -9 * Math.sin(((x - 0.48) / 0.14) * Math.PI); // T wave
+    if (x > 0.12 && x < 0.2) return -6 * Math.sin(((x - 0.12) / 0.08) * Math.PI);
+    if (x >= 0.26 && x < 0.29) return 10;
+    if (x >= 0.29 && x < 0.33) return -34;
+    if (x >= 0.33 && x < 0.37) return 14 + stShift;
+    if (x >= 0.37 && x < 0.46) return stShift * 0.85;
+    if (x >= 0.48 && x < 0.62) return -9 * Math.sin(((x - 0.48) / 0.14) * Math.PI);
     return 0;
   }
 
@@ -103,7 +103,7 @@ function initEscalationSimulator() {
     },
     "3": {
       title: "Step 3 (>90s) · Clinical Triage & 30s ECG Strip (Dr. Jon Azpeitia)",
-      detail: "Encrypted 30-second pre- and post-event ECG + skin temperature trend routes to the cardiology triage dashboard and emergency dispatch."
+      detail: "Encrypted 30-second pre- and post-event ECG + skin temperature trend routes via the Django REST API to the cardiology triage dashboard."
     }
   };
 
@@ -185,53 +185,9 @@ function initGanttFilter() {
   renderRows("All");
 }
 
-// 5. 10-Minute Oral Exam Rehearsal Timer (team.html)
-function initOralTimer() {
-  const display = document.getElementById("oralTimerDisplay");
-  const startBtn = document.getElementById("oralStartBtn");
-  const resetBtn = document.getElementById("oralResetBtn");
-  if (!display || !startBtn || !resetBtn) return;
-
-  let secondsLeft = 600; // 10 minutes max per Section 4.1 of Guidelines
-  let timer = null;
-
-  function fmt(sec) {
-    const m = String(Math.floor(sec / 60)).padStart(2, "0");
-    const s = String(sec % 60).padStart(2, "0");
-    return `${m}:${s}`;
-  }
-
-  startBtn.addEventListener("click", () => {
-    if (timer) {
-      clearInterval(timer);
-      timer = null;
-      startBtn.querySelector(".roll-track span:first-child").textContent = "Resume Pitch";
-      return;
-    }
-    startBtn.querySelector(".roll-track span:first-child").textContent = "Pause Pitch";
-    timer = setInterval(() => {
-      if (secondsLeft > 0) {
-        secondsLeft--;
-        display.textContent = fmt(secondsLeft);
-      } else {
-        clearInterval(timer);
-      }
-    }, 1000);
-  });
-
-  resetBtn.addEventListener("click", () => {
-    clearInterval(timer);
-    timer = null;
-    secondsLeft = 600;
-    display.textContent = "10:00";
-    startBtn.querySelector(".roll-track span:first-child").textContent = "Start 10:00 Pitch";
-  });
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   initTelemetryPlayer();
   initEscalationSimulator();
   initRoleViewToggle();
   initGanttFilter();
-  initOralTimer();
 });
