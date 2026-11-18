@@ -1,0 +1,229 @@
+/* ==========================================================================
+   CardioPatch 4.0 — Signature UI Animations
+   1. Rolling Button Labels (.btn-roll)
+   2. Directional Background Wipes (.btn-wipe, .card-wipe, .nav-wipe)
+   3. Scroll-Triggered Two-Tone Section Sweeps (.two-tone-sweep)
+   4. Hover Image/Visual Focus & Enlarge (.focus-zoom-group / .focus-zoom-frame)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1 & 2. Rolling Label Buttons + Directional Background Wipe
+   -------------------------------------------------------------------------- */
+.btn-roll {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 26px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease;
+}
+
+.btn-roll--primary {
+  background: var(--ink-primary);
+  color: var(--ink-inverse);
+}
+
+.btn-roll--crimson {
+  background: var(--accent-crimson);
+  color: #ffffff;
+}
+
+.btn-roll--outline {
+  background: transparent;
+  color: inherit;
+  border-color: currentColor;
+}
+
+/* Directional Background Wipe Curtain */
+.btn-wipe::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--accent-coral);
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.45s cubic-bezier(0.77, 0, 0.175, 1);
+  z-index: -1;
+}
+
+.btn-roll--primary.btn-wipe::before {
+  background: var(--accent-crimson);
+}
+
+.btn-roll--outline.btn-wipe::before {
+  background: var(--ink-primary);
+}
+
+.btn-wipe:hover::before,
+.btn-wipe:focus-visible::before {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.btn-roll--outline.btn-wipe:hover {
+  color: var(--ink-inverse);
+}
+
+/* Dual-Track Vertical Rolling Label */
+.roll-track {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  height: 1.25em;
+  line-height: 1.25em;
+}
+
+.roll-track > span {
+  display: block;
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.roll-track > span:nth-child(2) {
+  position: absolute;
+  left: 0;
+  top: 100%;
+}
+
+.btn-roll:hover .roll-track > span,
+.btn-roll:focus-visible .roll-track > span {
+  transform: translateY(-100%);
+}
+
+/* Subtle Nav Pill Wipe */
+.nav-wipe {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.nav-wipe::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(184, 41, 61, 0.12);
+  border-radius: var(--radius-pill);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: -1;
+}
+
+.nav-wipe:hover::before {
+  transform: scaleY(1);
+}
+
+/* Card Background Wipe on Hover */
+.card-wipe {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), color 0.35s ease;
+}
+
+.card-wipe::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(184, 41, 61, 0.08), rgba(224, 79, 95, 0.14));
+  transform: translateY(101%);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: -1;
+}
+
+.card-wipe:hover {
+  transform: translateY(-4px);
+}
+
+.card-wipe:hover::after {
+  transform: translateY(0);
+}
+
+/* --------------------------------------------------------------------------
+   3. Two-Tone Sweeps in Sections Once You Scroll Down
+   -------------------------------------------------------------------------- */
+.two-tone-sweep {
+  position: relative;
+}
+
+.two-tone-sweep::before,
+.two-tone-sweep::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  transition: transform 0.95s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* First curtain: deep crimson sweep */
+.two-tone-sweep::before {
+  background: var(--accent-crimson);
+  transform: translateX(0%);
+}
+
+/* Second curtain: warm sand tonal sweep slightly delayed */
+.two-tone-sweep::after {
+  background: var(--band-sand);
+  transform: translateX(0%);
+  transition-delay: 0.12s;
+}
+
+.two-tone-sweep.is-revealed::before {
+  transform: translateX(102%);
+}
+
+.two-tone-sweep.is-revealed::after {
+  transform: translateX(-102%);
+}
+
+/* --------------------------------------------------------------------------
+   4. Focus and Enlarge Visuals/Images Once You Hover Over Them
+   -------------------------------------------------------------------------- */
+.focus-zoom-frame {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #191c20;
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.4s ease,
+    opacity 0.4s ease;
+}
+
+.focus-zoom-frame img,
+.focus-zoom-frame svg,
+.focus-zoom-frame .visual-stage {
+  width: 100%;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Dim sibling frames slightly so hovered frame commands full focal attention */
+.focus-zoom-group:hover .focus-zoom-frame {
+  opacity: 0.72;
+  filter: saturate(0.8);
+}
+
+.focus-zoom-group .focus-zoom-frame:hover {
+  opacity: 1;
+  filter: saturate(1.08);
+  transform: scale(1.055);
+  box-shadow: var(--shadow-elevated);
+  z-index: 10;
+}
+
+.focus-zoom-frame:hover img,
+.focus-zoom-frame:hover svg,
+.focus-zoom-frame:hover .visual-stage {
+  transform: scale(1.07);
+}
