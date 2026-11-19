@@ -34,25 +34,12 @@
         </div>
 
         <!-- MANUAL DEVICE IMAGE PLACEHOLDER WITH LEVITATION ANIMATION -->
-        <div class="media-placeholder levitate-device" id="deviceHeroPlaceholder">
-          <!--
-            MANUAL IMAGE SLOT:
-            Replace src="" below with your device image path (e.g., "./cardiopatch-device.png")
-            and remove style="display:none;" on the <img> tag.
-          -->
+        <div class="media-placeholder levitate-device" style="border:none;background:transparent;">
           <img
-            src="https://drive.google.com/file/d/1hiJ1YM6_lLbpwZ20U_F0Eop3K8vBAvMd/view?usp=sharing"
+            src="https://lh3.googleusercontent.com/d/1hiJ1YM6_lLbpwZ20U_F0Eop3K8vBAvMd"
             alt="CardioPatch Smart Wearable Device"
-            style="display:none;"
-            onload="this.style.display='block'; document.getElementById('devicePlaceholderLabel').style.display='none';"
+            style="max-width:100%;max-height:380px;object-fit:contain;"
           />
-          <div id="devicePlaceholderLabel">
-            <span class="badge" style="background:rgba(255,255,255,0.2);color:#fff;">Device Image Placeholder</span>
-            <h3 style="margin-top:14px;font-size:1.35rem;">Insert CardioPatch Render Here</h3>
-            <p class="placeholder-hint" style="margin-top:8px;">
-              Open <code>index.html</code> and paste your device image link inside <code>&lt;img src="..."&gt;</code>. Levitation motion is already active.
-            </p>
-          </div>
         </div>
       </div>
     </section>
