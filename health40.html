@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Health 4.0 & Prototype · CardioPatch</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./animations.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <div id="site-header"></div>
+
+    <!-- Hero -->
+    <section class="band band--obsidian">
+      <span class="eyebrow eyebrow--light">04 · Health 4.0 Technology</span>
+      <h1 class="display-hero" style="margin-top:16px;">
+        Smart technology made <span class="serif-italic">simple</span> for every heart.
+      </h1>
+      <p style="margin-top:16px;max-width:720px;font-size:1.06rem;opacity:0.86;">
+        Explore how our prototype reads heart signals in real time and see which Health 4.0 technologies power CardioPatch—and which ones we intentionally left out to keep the patch light and easy to use.
+      </p>
+    </section>
+
+    <!-- Prototype Live Sinus Wave Demo (Moved from Overview, No "30s alert burst") -->
+    <section class="band band--alabaster two-tone-sweep" id="prototype">
+      <span class="eyebrow">Interactive Prototype Signal Demo</span>
+      <h2 class="display-section" style="margin:12px 0 12px;">See How Our AI Reads Your Heartbeat</h2>
+      <p style="max-width:700px;color:var(--ink-secondary);margin-bottom:22px;">
+        Switch between resting, walking up stairs, and a silent warning sign to see how CardioPatch separates everyday activity from real cardiac risk.
+      </p>
+
+      <div class="telemetry-bar">
+        <button class="play-circle" id="telemetryPlayBtn" aria-label="Play or pause ECG">❚❚</button>
+        <div class="waveform-box">
+          <canvas id="ecgCanvas"></canvas>
+        </div>
+        <div class="preset-pills">
+          <button class="preset-btn active" data-ecg-mode="rest">At Rest</button>
+          <button class="preset-btn" data-ecg-mode="stairs">Climbing Stairs</button>
+          <button class="preset-btn" data-ecg-mode="warning">Silent Warning</button>
+        </div>
+      </div>
+      <p id="telemetryReadout" style="margin-top:12px;font-size:0.9rem;color:var(--ink-secondary);"></p>
+    </section>
+
+    <!-- Health 4.0 Wheel ("Rosco") Image Placeholder + Section 3.1 Review (Intact) -->
+    <section class="band band--sand two-tone-sweep">
+      <div class="split-2" style="margin-bottom:34px;">
+        <div>
+          <span class="eyebrow">Section 3.1 · The 8 Health 4.0 Areas</span>
+          <h2 class="display-section" style="margin-top:14px;">
+            Six essential technologies. <span class="serif-italic">Zero</span> unnecessary clutter.
+          </h2>
+          <p style="margin-top:14px;font-size:0.98rem;color:var(--ink-secondary);">
+            Out of the eight Health 4.0 areas, we selected the six that directly improve continuous monitoring, battery efficiency, privacy, and comfort—leaving out Quantum Computing, Augmented Reality, and Autonomous Robots.
+          </p>
+        </div>
+
+        <!-- MANUAL PLACEHOLDER FOR THE 8 HEALTH 4.0 AREAS WHEEL ("ROSCO") -->
+        <div class="media-placeholder media-placeholder--light focus-zoom-frame">
+          <!--
+            MANUAL IMAGE SLOT:
+            Replace src="" below with your Health 4.0 8-area wheel ("rosco") image path
+            and remove style="display:none;" on the <img> tag.
+          -->
+          <img
+            src=""
+            alt="The 8 Health 4.0 Technological Areas Wheel"
+            style="display:none;"
+            onload="this.style.display='block'; document.getElementById('roscoPlaceholderLabel').style.display='none';"
+          />
+          <div id="roscoPlaceholderLabel">
+            <span class="badge badge--alert">Health 4.0 Wheel Placeholder</span>
+            <h3 style="margin-top:12px;font-size:1.25rem;">Insert 8-Area Health 4.0 Diagram</h3>
+            <p class="placeholder-hint" style="margin-top:8px;">
+              Open <code>health40.html</code> and paste your Health 4.0 wheel image link inside <code>&lt;img src="..."&gt;</code>.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Complete Section 3.1 Review Table (Kept Intact as Requested) -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Health 4.0 Area</th>
+              <th>Useful?</th>
+              <th>Justification</th>
+              <th>Role in CardioPatch</th>
+            </tr>
+          </thead>
+          <tbody id="health40ReviewBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div id="site-footer"></div>
+  </div>
+
+  <script src="./data.js"></script>
+  <script src="./shared.js"></script>
+  <script src="./widgets.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("health40ReviewBody").innerHTML = PROJECT_DATA.health40Review.map((item) => {
+        const isUsed = item.useful.startsWith("Yes");
+        return `
+          <tr>
+            <td><strong>${item.area}</strong></td>
+            <td><span class="badge ${isUsed ? "badge--yes" : "badge--no"}">${item.useful}</span></td>
+            <td>${item.justification}</td>
+            <td>${item.role}</td>
+          </tr>
+        `;
+      }).join("");
+    });
+  </script>
+</body>
+</html>

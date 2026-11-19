@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Why Us? · CardioPatch</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./animations.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <div id="site-header"></div>
+
+    <!-- Hero -->
+    <section class="band band--crimson">
+      <div class="radial-rings"></div>
+      <div style="position:relative;z-index:2;">
+        <span class="eyebrow eyebrow--light">03 · Why CardioPatch?</span>
+        <h1 class="display-hero" style="margin-top:16px;">
+          Real-time alerts, <span class="serif-italic">not</span> delayed reports.
+        </h1>
+        <p style="margin-top:16px;max-width:700px;font-size:1.06rem;opacity:0.92;">
+          See how CardioPatch outperforms traditional retrospective patches, read feedback from the doctors and families who helped shape it, and explore how we engineer reliability.
+        </p>
+      </div>
+    </section>
+
+    <!-- Sub-section A: Competitor Comparison (Moved from Clinical Needs) -->
+    <section class="band band--alabaster two-tone-sweep">
+      <span class="eyebrow">03.A · CardioPatch vs. Existing Monitors</span>
+      <h2 class="display-section" style="margin:12px 0 14px;">Why Retrospective Holter Patches Fall Short</h2>
+      <p style="max-width:740px;color:var(--ink-secondary);margin-bottom:24px;">
+        Existing wearable ECG patches record rhythm data for days, but doctors only review the results <em>after</em> the monitoring period ends. CardioPatch analyzes ECG and skin temperature live to send immediate warnings when it matters.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Device</th>
+              <th>Provider</th>
+              <th>Monitoring Capability</th>
+              <th>Alert Speed</th>
+              <th>Clinical Focus</th>
+            </tr>
+          </thead>
+          <tbody id="competitorTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Sub-section B: Voices From Development (Section 2.3 Testimonials) -->
+    <section class="band band--sand two-tone-sweep">
+      <span class="eyebrow">03.B · Co-Designed With Real People</span>
+      <h2 class="display-section" style="margin:12px 0 24px;">Voices That Shaped CardioPatch</h2>
+      <div class="grid-2 focus-zoom-group" id="testimonialsGrid"></div>
+    </section>
+
+    <!-- Sub-section C: Built For Real-World Reliability (Moved from Section 4.2 Risks) -->
+    <section class="band band--mist two-tone-sweep">
+      <span class="eyebrow">03.C · Engineering Reliability &amp; Safety</span>
+      <h2 class="display-section" style="margin:12px 0 14px;">How We Solve Real-World Wearable Challenges</h2>
+      <p style="max-width:720px;color:var(--ink-secondary);margin-bottom:24px;">
+        Continuous home monitoring brings four key technical challenges. Here is how CardioPatch is engineered to overcome each one safely.
+      </p>
+      <div class="grid-2 focus-zoom-group" id="safeguardsGrid"></div>
+    </section>
+
+    <div id="site-footer"></div>
+  </div>
+
+  <script src="./data.js"></script>
+  <script src="./shared.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("competitorTableBody").innerHTML = PROJECT_DATA.competitors.map((c) => `
+        <tr style="${c.highlight ? "background:#fff4f6;font-weight:600;" : ""}">
+          <td><strong>${c.name}</strong></td>
+          <td>${c.provider}</td>
+          <td>${c.monitoring}</td>
+          <td><span class="badge ${c.highlight ? "badge--yes" : "badge--no"}">${c.alerting}</span></td>
+          <td>${c.focus}</td>
+        </tr>
+      `).join("");
+
+      document.getElementById("testimonialsGrid").innerHTML = PROJECT_DATA.testimonials.map((t) => `
+        <article class="card card-wipe focus-zoom-frame">
+          <h3 style="font-size:1.25rem;">${t.person}</h3>
+          <p style="font-size:0.86rem;font-weight:700;color:var(--accent-crimson);margin-top:2px;">${t.role}</p>
+          <blockquote style="margin:14px 0;padding-left:14px;border-left:3px solid var(--accent-crimson);font-style:italic;color:var(--ink-primary);">
+            "${t.quote}"
+          </blockquote>
+          <p style="font-size:0.92rem;color:var(--ink-secondary);"><strong>How we solved it:</strong> ${t.takeaway}</p>
+        </article>
+      `).join("");
+
+      document.getElementById("safeguardsGrid").innerHTML = PROJECT_DATA.safeguards.map((s) => `
+        <article class="card card-wipe focus-zoom-frame">
+          <span class="badge badge--yes">Engineered Safeguard</span>
+          <h3 style="margin-top:12px;font-size:1.22rem;">${s.challenge}</h3>
+          <p style="margin-top:8px;font-size:0.94rem;color:var(--ink-secondary);">${s.solution}</p>
+        </article>
+      `).join("");
+    });
+  </script>
+</body>
+</html>

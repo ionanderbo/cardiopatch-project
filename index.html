@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CardioPatch 4.0 · Early Detection of Heart Attacks</title>
+  <title>CardioPatch · Smart Wearable Patch for Early Heart Attack Detection</title>
   <link rel="stylesheet" href="./styles.css" />
   <link rel="stylesheet" href="./animations.css" />
 </head>
@@ -11,81 +11,104 @@
   <div class="page-shell">
     <div id="site-header"></div>
 
-    <!-- Band 1: Hero with Radial Linework & Live ECG/Thermal Telemetry Player -->
+    <!-- Band 1: Product Hero with Levitating Device Image Placeholder -->
     <section class="band band--crimson">
       <div class="radial-rings"></div>
-      <div style="position:relative;z-index:2;max-width:920px;margin:0 auto;text-align:center;">
-        <span class="eyebrow eyebrow--light">Group 06 · Biomedical Engineering · Health 4.0</span>
-        <h1 class="display-hero" style="margin-top:18px;">
-          Continuous cardiac AI for <span class="serif-italic">silent</span> heart attacks.
-        </h1>
-        <p style="margin:18px auto 28px;max-width:680px;font-size:1.08rem;opacity:0.9;">
-          Proposed by <strong>Sofía Bastero Echevarría</strong> &amp; Group 06 — a breathable IP67 chest patch combining single-lead ECG, skin thermometry, and low-power edge AI to alert clinicians before acute myocardial infarction turns fatal.
-        </p>
-        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-          <a href="solution.html" class="btn-roll btn-roll--primary btn-wipe">
-            <span class="roll-track"><span>Explore Health 4.0 Architecture</span><span>Explore Health 4.0 Architecture →</span></span>
-          </a>
-          <a href="problem.html" class="btn-roll btn-roll--outline btn-wipe">
-            <span class="roll-track"><span>Review Clinical Evidence</span><span>Review Clinical Evidence →</span></span>
-          </a>
+      <div class="split-2" style="position:relative;z-index:2;">
+        <div>
+          <span class="eyebrow eyebrow--light">Smart Wearable Cardiac Patch</span>
+          <h1 class="display-hero" style="margin-top:16px;">
+            Peace of mind on your chest, <span class="serif-italic">24 hours</span> a day.
+          </h1>
+          <p style="margin-top:18px;font-size:1.08rem;opacity:0.92;max-width:540px;">
+            CardioPatch is a lightweight, shower-proof chest patch powered by artificial intelligence. It continuously tracks your heart rhythm and skin temperature to spot early warning signs of a heart attack—even when you feel no chest pain.
+          </p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;">
+            <a href="why-us.html" class="btn-roll btn-roll--primary btn-wipe">
+              <span class="roll-track"><span>Why CardioPatch?</span><span>Why CardioPatch? →</span></span>
+            </a>
+            <a href="health40.html#prototype" class="btn-roll btn-roll--outline btn-wipe">
+              <span class="roll-track"><span>See How It Works</span><span>See How It Works →</span></span>
+            </a>
+          </div>
         </div>
-      </div>
 
-      <!-- Interactive Telemetry Bar (Inspired by Reference Bottom Media Strip) -->
-      <div class="telemetry-bar" style="position:relative;z-index:2;">
-        <button class="play-circle" id="telemetryPlayBtn" aria-label="Play or pause ECG">❚❚</button>
-        <div class="waveform-box">
-          <canvas id="ecgCanvas"></canvas>
-        </div>
-        <div class="preset-pills">
-          <button class="preset-btn active" data-preset="normal">Normal Sinus</button>
-          <button class="preset-btn" data-preset="silent">Silent ST-Shift</button>
-          <button class="preset-btn" data-preset="burst">30s Alert Burst</button>
+        <!-- MANUAL DEVICE IMAGE PLACEHOLDER WITH LEVITATION ANIMATION -->
+        <div class="media-placeholder levitate-device" id="deviceHeroPlaceholder">
+          <!--
+            MANUAL IMAGE SLOT:
+            Replace src="" below with your device image path (e.g., "./cardiopatch-device.png")
+            and remove style="display:none;" on the <img> tag.
+          -->
+          <img
+            src=""
+            alt="CardioPatch Smart Wearable Device"
+            style="display:none;"
+            onload="this.style.display='block'; document.getElementById('devicePlaceholderLabel').style.display='none';"
+          />
+          <div id="devicePlaceholderLabel">
+            <span class="badge" style="background:rgba(255,255,255,0.2);color:#fff;">Device Image Placeholder</span>
+            <h3 style="margin-top:14px;font-size:1.35rem;">Insert CardioPatch Render Here</h3>
+            <p class="placeholder-hint" style="margin-top:8px;">
+              Open <code>index.html</code> and paste your device image link inside <code>&lt;img src="..."&gt;</code>. Levitation motion is already active.
+            </p>
+          </div>
         </div>
       </div>
-      <p id="telemetryReadout" style="position:relative;z-index:2;text-align:center;margin-top:12px;font-size:0.86rem;opacity:0.95;"></p>
     </section>
 
-    <!-- Band 2: Asymmetric Editorial Split (Two-Tone Scroll Sweep) -->
+    <!-- Band 2: Simple, Foolproof 3-Step Everyday Experience -->
+    <section class="band band--alabaster two-tone-sweep">
+      <span class="eyebrow">Effortless Daily Protection</span>
+      <h2 class="display-section" style="margin:12px 0 28px;">How CardioPatch protects you every day</h2>
+
+      <div class="grid-3 focus-zoom-group">
+        <article class="card card-wipe focus-zoom-frame">
+          <span class="badge badge--yes">Step 01 · Wear &amp; Forget</span>
+          <h3 style="margin-top:14px;font-size:1.3rem;">Stick it on and live normally</h3>
+          <p style="margin-top:10px;color:var(--ink-secondary);font-size:0.95rem;">
+            Soft, breathable, hypoallergenic silicone sticks gently to your chest. It is IP67 water-resistant, so you can walk, sleep, and shower without taking it off.
+          </p>
+        </article>
+
+        <article class="card card-wipe focus-zoom-frame">
+          <span class="badge badge--yes">Step 02 · Smart AI Watch</span>
+          <h3 style="margin-top:14px;font-size:1.3rem;">Continuous quiet protection</h3>
+          <p style="margin-top:10px;color:var(--ink-secondary);font-size:0.95rem;">
+            Built-in AI analyzes your heart signal and skin temperature 24/7. Normal exercise is ignored—only genuine warning changes trigger an alert.
+          </p>
+        </article>
+
+        <article class="card card-wipe focus-zoom-frame">
+          <span class="badge badge--yes">Step 03 · Faster Care</span>
+          <h3 style="margin-top:14px;font-size:1.3rem;">Connected to family &amp; doctors</h3>
+          <p style="margin-top:10px;color:var(--ink-secondary);font-size:0.95rem;">
+            Your phone app stays calm and simple while securely sharing critical heart strips with healthcare professionals so you get medical attention sooner.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Band 3: Who Is It For? -->
     <section class="band band--sand two-tone-sweep">
       <div class="split-2">
         <div>
-          <span class="eyebrow">Chapter 1.2 · Selected Topic Justification</span>
+          <span class="eyebrow">Designed For Real People</span>
           <h2 class="display-section" style="margin-top:14px;">
-            A wearable system purpose-built to catch <span class="serif-italic">unfelt</span> ischemia.
+            Built for peace of mind at <span class="serif-italic">home</span> and in rural areas.
           </h2>
         </div>
         <div>
           <p style="font-size:1.05rem;color:var(--ink-secondary);">
-            Cardiovascular diseases claim <strong>17.9 million lives annually</strong> (32% of all global deaths) [12], yet roughly <strong>45% of myocardial infarctions occur silently</strong> without classic chest pain [14]. Traditional 12-lead ECGs and short-term Holter monitors capture only narrow snapshots—leaving high-risk seniors, diabetic patients, and rural residents unprotected.
+            Whether you are managing high blood pressure or diabetes, recovering from a previous cardiac event, or living far from a major hospital, CardioPatch watches over your heart continuously—with no complicated buttons or technical setup.
           </p>
-          <p style="margin-top:14px;font-size:0.92rem;color:var(--ink-muted);">
-            Disclaimer: CardioPatch 4.0 is an early-warning clinical decision-support tool; it does not replace physicians or guarantee prediction of every acute cardiac event.
-          </p>
+          <div style="margin-top:22px;">
+            <a href="clinical-needs.html" class="btn-roll btn-roll--primary btn-wipe">
+              <span class="roll-track"><span>Explore Clinical Needs</span><span>Explore Clinical Needs →</span></span>
+            </a>
+          </div>
         </div>
       </div>
-    </section>
-
-    <!-- Band 3: Chapter 1.1 — 4 Project Options Evaluated by Group 06 -->
-    <section class="band band--alabaster two-tone-sweep">
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;margin-bottom:28px;">
-        <div>
-          <span class="eyebrow">Chapter 1.1 · Options Considered</span>
-          <h2 class="display-section" style="margin-top:10px;">Four Biomedical Proposals Evaluated</h2>
-        </div>
-        <a href="problem.html" class="btn-roll btn-roll--primary btn-wipe">
-          <span class="roll-track"><span>Next: Chapter 2 Need</span><span>Next: Chapter 2 Need →</span></span>
-        </a>
-      </div>
-      <div class="grid-2 focus-zoom-group" id="optionsGrid"></div>
-    </section>
-
-    <!-- Band 4: Modular Sub-Page Directory (Hover Focus & Enlarge Cards) -->
-    <section class="band band--mist two-tone-sweep">
-      <span class="eyebrow">Multi-Page Repository Structure</span>
-      <h2 class="display-section" style="margin:12px 0 24px;">Navigate Every Report Chapter</h2>
-      <div class="grid-3 focus-zoom-group" id="chapterDirectory"></div>
     </section>
 
     <div id="site-footer"></div>
@@ -93,34 +116,5 @@
 
   <script src="./data.js"></script>
   <script src="./shared.js"></script>
-  <script src="./widgets.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const optGrid = document.getElementById("optionsGrid");
-      if (optGrid) {
-        optGrid.innerHTML = PROJECT_DATA.options.map((o) => `
-          <article class="card card-wipe focus-zoom-frame" style="background:${o.selected ? "#fff5f6" : "#ffffff"};border-color:${o.selected ? "var(--accent-crimson)" : "var(--border-subtle)"};">
-            <span class="badge ${o.selected ? "badge--alert" : "badge--no"}">${o.number}</span>
-            <h3 style="margin-top:12px;font-size:1.25rem;">${o.title}</h3>
-            <p style="font-size:0.86rem;color:var(--accent-crimson);font-weight:700;margin-top:4px;">Proposed by ${o.proposer}</p>
-            <p style="margin-top:10px;font-size:0.94rem;color:var(--ink-secondary);">${o.summary}</p>
-            <p style="margin-top:10px;font-size:0.84rem;font-family:var(--font-mono);color:var(--ink-primary);">${o.stats}</p>
-            <p style="margin-top:10px;font-size:0.85rem;color:var(--ink-muted);border-top:1px solid var(--border-subtle);padding-top:10px;">${o.decisionNote}</p>
-          </article>
-        `).join("");
-      }
-
-      const dirGrid = document.getElementById("chapterDirectory");
-      if (dirGrid) {
-        dirGrid.innerHTML = PROJECT_DATA.nav.map((n) => `
-          <a href="${n.href}" class="card card-wipe focus-zoom-frame" style="text-decoration:none;color:inherit;background:#ffffff;display:block;">
-            <span class="eyebrow">${n.chapter}</span>
-            <h3 style="margin-top:14px;font-size:1.3rem;">${n.label}</h3>
-            <p style="margin-top:8px;font-size:0.9rem;color:var(--ink-secondary);">Open dedicated sub-page &amp; interactive modules →</p>
-          </a>
-        `).join("");
-      }
-    });
-  </script>
 </body>
 </html>
