@@ -1,431 +1,601 @@
 /* ==========================================================================
-   CardioPatch — Prototype Login & Real-Time Biosignal Engine
+   CardioPatch — Prototype Login, Clinical Profiles & Real-Time ECG Engine
    ========================================================================== */
 
-(function () {
-  const SESSION_KEY = "cardiopatch_demo_user_v1";
-
-  const PRESETS = {
-    javier: {
-      name: "Javier Mendizabal",
-      age: 68,
-      deviceId: "CP-2026-068",
-      email: "javier.mendizabal@cardiopatch.eu",
-      location: "Zona Rural (Bizkaia)",
-      history: "IAM previo (2024) + Hipertensión",
-      risk: "Isquemia silente sin dolor torácico",
-      caregiver: "Carmen Mendizabal (Hija)"
-    },
-    rural: {
-      name: "Miren Etxebarria",
-      age: 74,
-      deviceId: "CP-2026-104",
-      email: "miren.etxebarria@cardiopatch.eu",
-      location: "Zona Rural (Álava)",
-      history: "Diabetes Tipo 2 + Hipertensión",
-      risk: "Riesgo cardiovascular elevado",
-      caregiver: "Jon Etxebarria (Hijo)"
-    }
-  };
-
-  let animationStarted = false;
-  let isPlaying = true;
-  let showGrid = true;
-  let activeMode = "normal";
-  let ecgPhase = 0;
-  let lastBeatIndex = -1;
-  let trendHistory = [];
-
-  const MODES = {
-    normal: {
+const DEMO_PATIENTS = {
+  javier: {
+    key: "javier",
+    id: "CP-2026-014",
+    token: "CP-TOKEN-JM68",
+    name: "Javier Mendizabal",
+    ageSex: "68 yrs · Male",
+    location: "Bilbao, Basque Country",
+    hubId: "CardioPatch #CP-04A",
+    hasArrhythmiaEvent: false,
+    baseline: {
       bpm: 68,
-      hrv: "HRV (RMSSD): 44 ms · Regular",
-      temp: 36.6,
-      tempTrend: "Estable (Δ 0.0 °C / 15 min)",
-      stText: "0.0",
-      aiTier: "TinyML Tier 0 · Sin anomalías",
-      bannerText: "Sistema Activo — Ritmo Cardíaco Estable",
-      bannerClass: "badge badge--yes",
-      stShift: 0,
-      noiseAmp: 0.4,
-      speed: 0.0115,
-      stroke: "#2bb673"
+      stMm: 0.0,
+      tempC: 36.6,
+      hrvMs: 42
     },
-    stairs: {
-      bpm: 116,
-      hrv: "HRV (RMSSD): 26 ms · Esfuerzo fisiológico",
-      temp: 36.9,
-      tempTrend: "Ligero ascenso (+0.3 °C por actividad)",
-      stText: "-0.1",
-      aiTier: "TinyML Tier 0 · Taquicardia sinusal filtrada (0 falsas alarmas)",
-      bannerText: "Actividad Física Detectada — Ritmo Sinusal Normal",
-      bannerClass: "badge badge--yes",
-      stShift: 1.5,
-      noiseAmp: 1.1,
-      speed: 0.0195,
-      stroke: "#f0a538"
+    clinicalHistory: {
+      primaryDiagnosis: "Essential Hypertension & Prior Acute Myocardial Infarction (2023)",
+      medications: "Aspirin 100 mg, Bisoprolol 5 mg, Atorvastatin 40 mg, Ramipril 5 mg",
+      allergies: "None reported (Hypoallergenic silicone patch compatible)",
+      familyHistory: "Father suffered acute myocardial infarction at age 64; mother diagnosed with chronic hypertension and hypercholesterolemia.",
+      caregiver: "Carmen Mendizabal (Daughter · Authorized Secondary Alert Recipient)"
     },
-    ischemia: {
-      bpm: 104,
-      hrv: "HRV (RMSSD): 14 ms · Variabilidad reducida",
-      temp: 35.7,
-      tempTrend: "Descenso periférico (-0.9 °C en 12 min)",
-      stText: "-1.6",
-      aiTier: "TinyML Tier 1 · ¡Posible Isquemia Silente! Tira 30s enviada",
-      bannerText: "Alerta Preventiva Activa — Comprobando Estado con Paciente",
-      bannerClass: "badge badge--alert",
-      stShift: 18,
-      noiseAmp: 0.5,
-      speed: 0.0175,
-      stroke: "#ff4d64"
+    deviceSpecs: {
+      model: "CardioPatch Hub v1.4 + Disposable Silicone Gel Patch",
+      biosensors: "Single-Lead ECG (AD8232/MAX30003, 250 Hz) + Medical NTC Skin Thermistor",
+      ingressProtection: "IP67 Water-Resistant (Continuous 24/7 wear including showering)",
+      edgeAi: "TinyML 2-Tier Classifier (Filters benign exertion; flags silent ischemia/arrhythmia)",
+      connectivity: "BLE 5.0 → Smartphone Gateway → TLS 1.3 EU Cloud + 24h Offline Flash Buffer",
+      battery: "88% (6.1 days remaining)",
+      impedance: "Optimal (< 4.2 kΩ · Good Skin Adhesion)"
+    }
+  },
+  elena: {
+    key: "elena",
+    id: "CP-2026-029",
+    token: "CP-TOKEN-EE72",
+    name: "Elena Etxebarria",
+    ageSex: "72 yrs · Female",
+    location: "Rural Bizkaia (42 km from Tertiary Cardiology)",
+    hubId: "CardioPatch #CP-09B",
+    hasArrhythmiaEvent: true,
+    baseline: {
+      bpm: 76,
+      stMm: -0.1,
+      tempC: 36.5,
+      hrvMs: 36
     },
-    noise: {
-      bpm: 74,
-      hrv: "HRV (RMSSD): 41 ms · Filtro 0.5–40 Hz + Wavelet activo",
-      temp: 36.6,
-      tempTrend: "Estable · Artefacto muscular suprimido",
-      stText: "0.0",
-      aiTier: "Biosignal DSP · Ruido de movimiento eliminado en tiempo real",
-      bannerText: "Sistema Activo — Señal Limpia Tras Filtrado DSP",
-      bannerClass: "badge badge--yes",
-      stShift: 0,
-      noiseAmp: 6.5,
-      speed: 0.0125,
-      stroke: "#4cc9f0"
-    }
-  };
-
-  function populateUserProfile(user) {
-    const firstName = user.name.split(" ")[0] || user.name;
-    document.getElementById("dashPatientBadge").textContent = `Paciente Activo · ID ${user.deviceId}`;
-    document.getElementById("dashPatientTitle").textContent = `${user.name} · ${user.age} años`;
-    document.getElementById("dashPatientSub").textContent = `${user.location || "Zona Rural (Bizkaia)"} · Parche Activo IP65 · Sincronizado vía BLE 5.0 con Cloud UE`;
-    document.getElementById("histName").textContent = `${user.name} (${user.age} años)`;
-
-    document.querySelectorAll(".dyn-patient-short").forEach((el) => {
-      el.textContent = firstName;
-    });
-  }
-
-  function showDashboard(user) {
-    populateUserProfile(user);
-    document.getElementById("loginGateView").style.display = "none";
-    document.getElementById("authenticatedDashboard").style.display = "flex";
-    if (!animationStarted) {
-      animationStarted = true;
-      initWaveforms();
-    }
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function showLogin() {
-    sessionStorage.removeItem(SESSION_KEY);
-    document.getElementById("authenticatedDashboard").style.display = "none";
-    document.getElementById("loginGateView").style.display = "block";
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function applyTelemetryMode(modeKey) {
-    activeMode = modeKey;
-    const m = MODES[modeKey];
-
-    document.querySelectorAll("[data-rt-mode]").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.rtMode === modeKey);
-    });
-
-    document.getElementById("kpiBpm").innerHTML = `${m.bpm} <small style="font-size:1rem;font-weight:600;">BPM</small>`;
-    document.getElementById("kpiHrv").textContent = m.hrv;
-    document.getElementById("kpiTemp").innerHTML = `${m.temp.toFixed(1)} <small style="font-size:1rem;font-weight:600;">&deg;C</small>`;
-    document.getElementById("kpiTempTrend").textContent = m.tempTrend;
-    document.getElementById("kpiSt").innerHTML = `${m.stText} <small style="font-size:1rem;font-weight:600;">mm</small>`;
-    document.getElementById("kpiAiTier").textContent = m.aiTier;
-
-    const banner = document.getElementById("d4allCalmBanner");
-    banner.textContent = m.bannerText;
-    banner.className = m.bannerClass;
-
-    if (modeKey === "ischemia") {
-      triggerEscalationVisual(1);
-    } else {
-      resetEscalationVisual();
+    arrhythmiaState: {
+      bpm: 134,
+      stMm: -1.6,
+      tempC: 35.7,
+      hrvMs: 14
+    },
+    clinicalHistory: {
+      primaryDiagnosis: "Type 2 Diabetes Mellitus, Dyslipidemia & Prior Silent Myocardial Ischemia",
+      medications: "Metformin 850 mg, Empagliflozin 10 mg, Clopidogrel 75 mg, Losartan 50 mg",
+      allergies: "Mild adhesive sensitivity to standard acrylic tape (Solved via breathable medical silicone)",
+      familyHistory: "Mother experienced late-onset atrial fibrillation and silent myocardial infarction at age 70; brother treated for Type 2 diabetes and coronary artery disease.",
+      caregiver: "Ander Etxebarria (Son · Primary Family Emergency Contact)"
+    },
+    deviceSpecs: {
+      model: "CardioPatch Hub v1.4 + Disposable Silicone Gel Patch",
+      biosensors: "Single-Lead ECG (AD8232/MAX30003, 250 Hz) + Medical NTC Skin Thermistor",
+      ingressProtection: "IP67 Water-Resistant (Continuous 24/7 wear including showering)",
+      edgeAi: "TinyML 2-Tier Classifier (Active 30s Pre/Post ECG Strip Capture Enabled)",
+      connectivity: "BLE 5.0 → Smartphone Gateway → TLS 1.3 EU Cloud + 24h Offline Flash Buffer",
+      battery: "81% (5.6 days remaining)",
+      impedance: "Optimal (< 4.8 kΩ · Good Skin Adhesion)"
     }
   }
+};
 
-  let escalationTimers = [];
-  function resetEscalationVisual() {
-    escalationTimers.forEach((t) => clearTimeout(t));
-    escalationTimers = [];
-    ["escStep1", "escStep2", "escStep3"].forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) el.classList.remove("triggered");
-    });
+let selectedPatientKey = "javier";
+let activePatient = null;
+let sessionStartTime = 0;
+let arrhythmiaActive = false;
+let arrhythmiaAlertShown = false;
+let isStreaming = true;
+let sweepSpeedMultiplier = 1; // 1 = 25 mm/s, 2 = 50 mm/s
+let audioEnabled = false;
+let audioCtx = null;
+
+// Real-time oscilloscope buffers
+const ECG_BUFFER_LEN = 650;
+const TEMP_BUFFER_LEN = 240;
+let ecgHistory = new Array(ECG_BUFFER_LEN).fill(0);
+let tempHistory = new Array(TEMP_BUFFER_LEN).fill(36.6);
+let hrvHistory = new Array(TEMP_BUFFER_LEN).fill(42);
+let writeCursor = 0;
+let cardiacPhase = 0;
+let lastBeatFlash = 0;
+let lastFrameTime = performance.now();
+let secondaryTickAccum = 0;
+
+function playMedicalBeep(isAlert) {
+  if (!audioEnabled) return;
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = isAlert ? "sawtooth" : "sine";
+    osc.frequency.value = isAlert ? 880 : 520;
+    gain.gain.setValueAtTime(isAlert ? 0.08 : 0.025, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + (isAlert ? 0.28 : 0.07));
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + (isAlert ? 0.29 : 0.08));
+  } catch (e) {
+    // Ignore autoplay restrictions if browser blocks audio
   }
+}
 
-  function triggerEscalationVisual(startAt = 1) {
-    resetEscalationVisual();
-    const steps = ["escStep1", "escStep2", "escStep3"];
-    steps.forEach((id, idx) => {
-      if (idx + 1 >= startAt) {
-        const timer = setTimeout(() => {
-          const el = document.getElementById(id);
-          if (el) el.classList.add("triggered");
-        }, (idx - (startAt - 1)) * 1100);
-        escalationTimers.push(timer);
-      }
-    });
-  }
-
-  function computeEcgSample(t, m, rawIndex) {
-    const x = ((t % 1) + 1) % 1;
-    let v = 0;
-
-    // P wave
-    if (x > 0.10 && x < 0.19) {
-      v -= 7.5 * Math.sin(((x - 0.10) / 0.09) * Math.PI);
-    }
-    // Q dip
-    if (x >= 0.24 && x < 0.27) {
-      v += 9 * Math.sin(((x - 0.24) / 0.03) * Math.PI);
-    }
-    // R spike
-    if (x >= 0.27 && x < 0.31) {
-      v -= 54 * Math.sin(((x - 0.27) / 0.04) * Math.PI);
-    }
-    // S dip
-    if (x >= 0.31 && x < 0.35) {
-      v += 18 * Math.sin(((x - 0.31) / 0.04) * Math.PI);
-    }
-    // ST segment (depressed downward in canvas +Y when stShift > 0)
-    if (x >= 0.35 && x < 0.46) {
-      v += m.stShift * 0.9;
-    }
-    // T wave (inverted in ischemia)
-    if (x >= 0.46 && x < 0.62) {
-      const tWave = Math.sin(((x - 0.46) / 0.16) * Math.PI);
-      v += m.stShift > 10 ? 11 * tWave : -13 * tWave;
-    }
-
-    // Subtle respiratory baseline wander + high-frequency motion component
-    const resp = 2.2 * Math.sin(t * 1.4);
-    const hfNoise = m.noiseAmp * (Math.sin(rawIndex * 0.47) * 0.6 + Math.cos(rawIndex * 1.13) * 0.4);
-    return v + resp + hfNoise;
-  }
-
-  function initWaveforms() {
-    const ecgCanvas = document.getElementById("rtEcgCanvas");
-    const trendCanvas = document.getElementById("rtTrendCanvas");
-    const beatDot = document.getElementById("liveBeatDot");
-    if (!ecgCanvas || !trendCanvas) return;
-
-    const ecgCtx = ecgCanvas.getContext("2d");
-    const trendCtx = trendCanvas.getContext("2d");
-
-    // Seed initial trend history
-    for (let i = 0; i < 90; i++) {
-      trendHistory.push({ bpm: 68 + Math.sin(i * 0.2) * 1.5, temp: 36.6 });
-    }
-
-    function drawMedicalGrid(ctx, w, h) {
-      if (!showGrid) return;
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.045)";
-      ctx.lineWidth = 1;
-      const minor = 16;
-      for (let x = 0; x < w; x += minor) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, h);
-        ctx.stroke();
-      }
-      for (let y = 0; y < h; y += minor) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(w, y);
-        ctx.stroke();
-      }
-
-      ctx.strokeStyle = "rgba(224, 79, 95, 0.14)";
-      const major = minor * 5;
-      for (let x = 0; x < w; x += major) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, h);
-        ctx.stroke();
-      }
-      for (let y = 0; y < h; y += major) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(w, y);
-        ctx.stroke();
-      }
-    }
-
-    function renderFrame() {
-      const dpr = window.devicePixelRatio || 1;
-      const m = MODES[activeMode];
-
-      // 1. Primary ECG Canvas
-      const r1 = ecgCanvas.parentElement.getBoundingClientRect();
-      ecgCanvas.width = r1.width * dpr;
-      ecgCanvas.height = r1.height * dpr;
-      ecgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      const w1 = r1.width;
-      const h1 = r1.height;
-      ecgCtx.clearRect(0, 0, w1, h1);
-      drawMedicalGrid(ecgCtx, w1, h1);
-
-      ecgCtx.strokeStyle = m.stroke;
-      ecgCtx.lineWidth = 2.4;
-      ecgCtx.shadowColor = m.stroke;
-      ecgCtx.shadowBlur = 8;
-      ecgCtx.beginPath();
-
-      for (let px = 0; px < w1; px++) {
-        const t = px / 150 + ecgPhase;
-        const y = h1 * 0.56 + computeEcgSample(t, m, px + ecgPhase * 120);
-        if (px === 0) ecgCtx.moveTo(px, y);
-        else ecgCtx.lineTo(px, y);
-      }
-      ecgCtx.stroke();
-      ecgCtx.shadowBlur = 0;
-
-      // Pulse beat dot on each R-peak cycle
-      const beatCycle = Math.floor(ecgPhase);
-      if (beatCycle !== lastBeatIndex && isPlaying) {
-        lastBeatIndex = beatCycle;
-        if (beatDot) {
-          beatDot.style.background = m.stroke;
-          beatDot.classList.add("pulse");
-          setTimeout(() => beatDot.classList.remove("pulse"), 140);
-        }
-        const jitterBpm = m.bpm + Math.round((Math.random() - 0.5) * 3);
-        trendHistory.push({ bpm: jitterBpm, temp: m.temp });
-        if (trendHistory.length > 90) trendHistory.shift();
-      }
-
-      // 2. Secondary Trend Canvas (BPM + Skin Temp)
-      const r2 = trendCanvas.parentElement.getBoundingClientRect();
-      trendCanvas.width = r2.width * dpr;
-      trendCanvas.height = r2.height * dpr;
-      trendCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      const w2 = r2.width;
-      const h2 = r2.height;
-      trendCtx.clearRect(0, 0, w2, h2);
-      drawMedicalGrid(trendCtx, w2, h2);
-
-      // Heart rate trend line (Cyan/Coral)
-      trendCtx.strokeStyle = m.stroke;
-      trendCtx.lineWidth = 2.2;
-      trendCtx.beginPath();
-      trendHistory.forEach((pt, idx) => {
-        const x = (idx / (trendHistory.length - 1)) * w2;
-        const normBpm = Math.max(45, Math.min(145, pt.bpm));
-        const y = h2 - ((normBpm - 45) / 100) * (h2 * 0.72) - 14;
-        if (idx === 0) trendCtx.moveTo(x, y);
-        else trendCtx.lineTo(x, y);
-      });
-      trendCtx.stroke();
-
-      // Skin temperature trend line (Soft Amber)
-      trendCtx.strokeStyle = "#f5b041";
-      trendCtx.lineWidth = 1.8;
-      trendCtx.setLineDash([5, 4]);
-      trendCtx.beginPath();
-      trendHistory.forEach((pt, idx) => {
-        const x = (idx / (trendHistory.length - 1)) * w2;
-        const normTemp = Math.max(34.5, Math.min(38.0, pt.temp));
-        const y = h2 - ((normTemp - 34.5) / 3.5) * (h2 * 0.65) - 16;
-        if (idx === 0) trendCtx.moveTo(x, y);
-        else trendCtx.lineTo(x, y);
-      });
-      trendCtx.stroke();
-      trendCtx.setLineDash([]);
-
-      if (isPlaying) {
-        ecgPhase += m.speed;
-      }
-      requestAnimationFrame(renderFrame);
-    }
-
-    renderFrame();
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("prototypeLoginForm");
-    if (!form) return;
-
-    // Preset buttons on Login screen
-    document.getElementById("fillJavierBtn").addEventListener("click", () => {
-      const p = PRESETS.javier;
-      document.getElementById("loginPatientName").value = p.name;
-      document.getElementById("loginPatientAge").value = p.age;
-      document.getElementById("loginPatientId").value = p.deviceId;
-      document.getElementById("loginEmail").value = p.email;
-    });
-
-    document.getElementById("fillCustomBtn").addEventListener("click", () => {
-      const p = PRESETS.rural;
-      document.getElementById("loginPatientName").value = p.name;
-      document.getElementById("loginPatientAge").value = p.age;
-      document.getElementById("loginPatientId").value = p.deviceId;
-      document.getElementById("loginEmail").value = p.email;
-    });
-
-    // Login Form Submit
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const user = {
-        name: document.getElementById("loginPatientName").value.trim() || "Javier Mendizabal",
-        age: document.getElementById("loginPatientAge").value || 68,
-        deviceId: document.getElementById("loginPatientId").value.trim() || "CP-2026-068",
-        email: document.getElementById("loginEmail").value.trim()
-      };
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
-      showDashboard(user);
-    });
-
-    // Logout button
-    document.getElementById("logoutDemoBtn").addEventListener("click", showLogin);
-
-    // Real-time Mode Buttons
-    document.querySelectorAll("[data-rt-mode]").forEach((btn) => {
-      btn.addEventListener("click", () => applyTelemetryMode(btn.dataset.rtMode));
-    });
-
-    // Play / Pause
-    document.getElementById("rtPlayPauseBtn").addEventListener("click", (e) => {
-      isPlaying = !isPlaying;
-      e.currentTarget.innerHTML = isPlaying ? "&#10074;&#10074;" : "&#9654;";
-    });
-
-    // Grid Toggle
-    document.getElementById("toggleGridBtn").addEventListener("click", (e) => {
-      showGrid = !showGrid;
-      e.currentTarget.textContent = `Cuadrícula: ${showGrid ? "ON" : "OFF"}`;
-    });
-
-    // Capture 30s ECG Strip
-    document.getElementById("captureStripBtn").addEventListener("click", () => {
-      const m = MODES[activeMode];
-      const now = new Date().toLocaleTimeString("es-ES");
-      const notice = document.getElementById("capturedStripNotice");
-      notice.style.display = "block";
-      notice.innerHTML = `<strong>&#10003; Tira ECG de 30 s capturada (${now}):</strong> FC ${m.bpm} BPM &middot; Temp. ${m.temp.toFixed(1)} &deg;C &middot; Segmento ST ${m.stText} mm &middot; Estado: <em>${m.aiTier}</em> (Listo para revisión del Dr. Jon Azpeitia vía HL7 FHIR).`;
-    });
-
-    // Escalation Simulation Buttons
-    document.getElementById("simulateEscalationBtn").addEventListener("click", () => triggerEscalationVisual(1));
-    document.getElementById("resetEscalationBtn").addEventListener("click", resetEscalationVisual);
-
-    // Restore session if already logged in during current browser session
-    const saved = sessionStorage.getItem(SESSION_KEY);
-    if (saved) {
-      try {
-        showDashboard(JSON.parse(saved));
-      } catch (_) {
-        showLogin();
-      }
-    }
+function updateLoginSelection(key) {
+  selectedPatientKey = key;
+  const p = DEMO_PATIENTS[key];
+  document.querySelectorAll("[data-select-patient]").forEach((card) => {
+    card.classList.toggle("selected", card.dataset.selectPatient === key);
   });
-})();
+  document.getElementById("loginPatientId").textContent = p.id;
+  document.getElementById("loginPatientName").textContent = p.name;
+  document.getElementById("loginAccessToken").textContent = p.token;
+}
+
+function renderStatusBanner() {
+  const container = document.getElementById("statusAlertContainer");
+  if (!container || !activePatient) return;
+
+  if (!activePatient.hasArrhythmiaEvent) {
+    // Javier Mendizabal — Always calm & stable
+    container.innerHTML = `
+      <div class="stable-banner">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+          <div>
+            <span class="badge badge--yes">D4ALL Patient &amp; Clinician View &middot; Normal Sinus</span>
+            <h3 style="margin-top:8px;font-size:1.25rem;">System Active &mdash; Heart Rhythm Stable</h3>
+            <p style="font-size:0.9rem;margin-top:4px;opacity:0.88;">
+              Edge AI Tier 0 active: normal sinus rhythm (68 BPM) and stable skin temperature (36.6 &deg;C) are logged quietly for daily clinical summary. Zero false alarms.
+            </p>
+          </div>
+          <span style="font-family:var(--font-mono);font-size:0.82rem;font-weight:700;">NO ANOMALIES DETECTED</span>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  // Elena Etxebarria — Pre-arrhythmia scan vs Sudden Arrhythmia Alert
+  if (!arrhythmiaActive) {
+    container.innerHTML = `
+      <div class="stable-banner">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+          <div>
+            <span class="badge badge--yes">Edge AI Continuous Scan Active</span>
+            <h3 style="margin-top:8px;font-size:1.22rem;">Monitoring Baseline Rhythm &amp; Thermoregulation...</h3>
+            <p style="font-size:0.9rem;margin-top:4px;opacity:0.88;">
+              Analyzing single-lead ECG morphology and NTC skin temperature in real time for silent ischemic or arrhythmic shifts.
+            </p>
+          </div>
+          <span style="font-family:var(--font-mono);font-size:0.82rem;font-weight:700;">LIVE SCANNING</span>
+        </div>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div class="arrhythmia-banner" role="alert">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;">
+          <div>
+            <span class="badge" style="background:#ffffff;color:#9e1f32;">&#9888; CRITICAL EDGE AI ALERT &middot; TIER 1 ANOMALY</span>
+            <h3 style="margin-top:10px;font-size:1.45rem;color:#ffffff;">
+              Sudden Arrhythmia &amp; Silent ST-Segment Shift Detected (Elena Etxebarria)
+            </h3>
+            <p style="margin-top:6px;font-size:0.94rem;opacity:0.95;max-width:780px;">
+              Irregular tachyarrhythmia (<strong>134 BPM</strong>), <strong>-1.6 mm ST-segment depression</strong>, and <strong>-0.8 &deg;C skin temperature drop</strong> detected without reported chest pain. A 30-second pre/post-event ECG strip has been locked and dispatched.
+            </p>
+          </div>
+          <button type="button" id="ackAlertBtn" class="preset-btn" style="background:#ffffff;color:#9e1f32;border:none;font-weight:800;">
+            Acknowledge Clinical Alert
+          </button>
+        </div>
+
+        <div class="grid-3" style="margin-top:16px;">
+          <div class="escalation-step">
+            <strong>1. Patient Check-In (0&ndash;30s)</strong>
+            <p style="margin-top:4px;opacity:0.9;">Gentle haptic prompt sent to Elena&rsquo;s smartphone: <em>&ldquo;Unusual heart pattern noticed. Are you comfortable?&rdquo;</em></p>
+          </div>
+          <div class="escalation-step">
+            <strong>2. Caregiver Push Dispatched</strong>
+            <p style="margin-top:4px;opacity:0.9;">High-priority mobile alert &amp; rural GPS location sent to son <strong>Ander Etxebarria</strong>.</p>
+          </div>
+          <div class="escalation-step">
+            <strong>3. Cardiology Triage Notified</strong>
+            <p style="margin-top:4px;opacity:0.9;">Encrypted 30s ECG strip &amp; thermal trend queued on <strong>Dr. Jon Azpeitia&rsquo;s</strong> clinical portal.</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const ackBtn = document.getElementById("ackAlertBtn");
+    if (ackBtn) {
+      ackBtn.addEventListener("click", () => {
+        ackBtn.textContent = "Alert Acknowledged by Clinician ✓";
+        ackBtn.style.background = "#246a59";
+        ackBtn.style.color = "#ffffff";
+      });
+    }
+  }
+}
+
+function triggerElenaArrhythmia() {
+  if (!activePatient || !activePatient.hasArrhythmiaEvent || arrhythmiaActive) return;
+  arrhythmiaActive = true;
+  arrhythmiaAlertShown = true;
+  renderStatusBanner();
+  playMedicalBeep(true);
+}
+
+function loadPatientDashboard(key) {
+  activePatient = DEMO_PATIENTS[key];
+  sessionStartTime = performance.now();
+  arrhythmiaActive = false;
+  arrhythmiaAlertShown = false;
+
+  // Reset buffers to patient baseline
+  ecgHistory = new Array(ECG_BUFFER_LEN).fill(0);
+  tempHistory = new Array(TEMP_BUFFER_LEN).fill(activePatient.baseline.tempC);
+  hrvHistory = new Array(TEMP_BUFFER_LEN).fill(activePatient.baseline.hrvMs);
+  writeCursor = 0;
+  cardiacPhase = 0;
+
+  // Switch views
+  document.getElementById("loginView").style.display = "none";
+  const dash = document.getElementById("dashboardView");
+  dash.style.display = "flex";
+
+  // Populate headers
+  document.getElementById("dashPatientHeader").textContent = `${activePatient.name} (${activePatient.ageSex})`;
+  document.getElementById("dashPatientSubheader").textContent =
+    `Patient ID: ${activePatient.id} · ${activePatient.location} · Paired Hub: ${activePatient.hubId}`;
+
+  const otherKey = key === "javier" ? "elena" : "javier";
+  document.getElementById("switchPatientBtn").textContent = `Switch to ${DEMO_PATIENTS[otherKey].name}`;
+
+  const replayBtn = document.getElementById("replayArrhythmiaBtn");
+  replayBtn.style.display = activePatient.hasArrhythmiaEvent ? "inline-block" : "none";
+
+  // Render Clinical & Family History
+  const h = activePatient.clinicalHistory;
+  document.getElementById("clinicalHistoryContent").innerHTML = `
+    <div class="spec-row"><strong>Primary Diagnosis</strong><span style="text-align:right;max-width:62%;">${h.primaryDiagnosis}</span></div>
+    <div class="spec-row"><strong>Active Medication</strong><span style="text-align:right;max-width:62%;">${h.medications}</span></div>
+    <div class="spec-row"><strong>Allergies / Skin</strong><span style="text-align:right;max-width:62%;">${h.allergies}</span></div>
+    <div class="spec-row" style="background:#fff7f8;padding:12px;border-radius:12px;margin-top:6px;">
+      <strong style="color:var(--accent-crimson);">Family History</strong>
+      <span style="text-align:right;max-width:65%;">${h.familyHistory}</span>
+    </div>
+    <div class="spec-row" style="margin-top:6px;"><strong>Emergency Contact</strong><span style="text-align:right;max-width:62%;">${h.caregiver}</span></div>
+  `;
+
+  // Render Device Characteristics
+  const d = activePatient.deviceSpecs;
+  document.getElementById("deviceSpecsContent").innerHTML = `
+    <div class="spec-row"><strong>Device Model</strong><span style="text-align:right;max-width:62%;">${d.model}</span></div>
+    <div class="spec-row"><strong>Biosensors</strong><span style="text-align:right;max-width:62%;">${d.biosensors}</span></div>
+    <div class="spec-row"><strong>Water Rating</strong><span style="text-align:right;max-width:62%;">${d.ingressProtection}</span></div>
+    <div class="spec-row"><strong>On-Patch Edge AI</strong><span style="text-align:right;max-width:62%;">${d.edgeAi}</span></div>
+    <div class="spec-row"><strong>IoT &amp; Security</strong><span style="text-align:right;max-width:62%;">${d.connectivity}</span></div>
+    <div class="spec-row"><strong>Battery &amp; Adhesion</strong><span style="text-align:right;max-width:62%;color:var(--accent-sage);font-weight:700;">${d.battery} · ${d.impedance}</span></div>
+  `;
+
+  renderStatusBanner();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// Synthesize single ECG sample at cardiac phase [0..1)
+function computeEcgVoltage(phase, isArrhythmic) {
+  let v = (Math.random() - 0.5) * 0.025; // subtle baseline sensor noise
+
+  if (!isArrhythmic) {
+    // Clean Normal Sinus P-QRS-T morphology
+    if (phase > 0.10 && phase < 0.19) {
+      v += 0.14 * Math.sin(((phase - 0.10) / 0.09) * Math.PI); // P wave
+    } else if (phase >= 0.24 && phase < 0.265) {
+      v -= 0.14 * Math.sin(((phase - 0.24) / 0.025) * Math.PI); // Q wave
+    } else if (phase >= 0.265 && phase < 0.305) {
+      v += 1.15 * Math.sin(((phase - 0.265) / 0.04) * Math.PI); // R peak
+    } else if (phase >= 0.305 && phase < 0.335) {
+      v -= 0.28 * Math.sin(((phase - 0.305) / 0.03) * Math.PI); // S wave
+    } else if (phase >= 0.45 && phase < 0.62) {
+      v += 0.26 * Math.sin(((phase - 0.45) / 0.17) * Math.PI); // T wave
+    }
+  } else {
+    // Sudden Arrhythmia + Silent ST-Segment Depression (-1.6 mm) + Fibrillatory baseline
+    v += 0.06 * Math.sin(phase * Math.PI * 14) + 0.04 * Math.cos(phase * Math.PI * 23);
+    if (phase >= 0.22 && phase < 0.25) {
+      v -= 0.18 * Math.sin(((phase - 0.22) / 0.03) * Math.PI);
+    } else if (phase >= 0.25 && phase < 0.31) {
+      v += 1.05 * Math.sin(((phase - 0.25) / 0.06) * Math.PI); // Widened irregular QRS
+    } else if (phase >= 0.31 && phase < 0.35) {
+      v -= 0.38 * Math.sin(((phase - 0.31) / 0.04) * Math.PI);
+    } else if (phase >= 0.35 && phase < 0.50) {
+      v -= 0.24; // Marked ST-segment depression
+    } else if (phase >= 0.50 && phase < 0.66) {
+      v -= 0.16 * Math.sin(((phase - 0.50) / 0.16) * Math.PI); // Inverted ischemic T wave
+    }
+  }
+  return v;
+}
+
+function drawEcgCanvas() {
+  const canvas = document.getElementById("liveEcgCanvas");
+  if (!canvas || !activePatient) return;
+  const ctx = canvas.getContext("2d");
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const w = rect.width;
+  const h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  // Medical ECG Grid lines
+  ctx.strokeStyle = arrhythmiaActive ? "rgba(224, 79, 95, 0.14)" : "rgba(54, 211, 153, 0.10)";
+  ctx.lineWidth = 1;
+  const step = 22;
+  for (let x = 0; x < w; x += step) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+  }
+  for (let y = 0; y < h; y += step) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+  }
+
+  // Waveform trace with erase gap ahead of sweeping cursor
+  const strokeColor = arrhythmiaActive ? "#ff4d64" : "#36d399";
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = 2.4;
+  ctx.beginPath();
+
+  const midY = h * 0.58;
+  const amp = h * 0.36;
+  const gapSize = 14;
+
+  let started = false;
+  for (let i = 0; i < ECG_BUFFER_LEN; i++) {
+    const distFromCursor = (i - writeCursor + ECG_BUFFER_LEN) % ECG_BUFFER_LEN;
+    if (distFromCursor < gapSize) {
+      started = false;
+      continue;
+    }
+    const x = (i / ECG_BUFFER_LEN) * w;
+    const y = midY - ecgHistory[i] * amp;
+    if (!started) {
+      ctx.moveTo(x, y);
+      started = true;
+    } else {
+      ctx.lineTo(x, y);
+    }
+  }
+  ctx.stroke();
+
+  // Leading phosphor dot
+  const cursorX = (writeCursor / ECG_BUFFER_LEN) * w;
+  const cursorY = midY - ecgHistory[writeCursor] * amp;
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.arc(cursorX, cursorY, 4, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawTempAndHrvCanvas() {
+  const canvas = document.getElementById("liveTempCanvas");
+  if (!canvas || !activePatient) return;
+  const ctx = canvas.getContext("2d");
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const w = rect.width;
+  const h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  // Subtle horizontal reference grid
+  ctx.strokeStyle = "rgba(255,255,255,0.07)";
+  ctx.lineWidth = 1;
+  [0.25, 0.5, 0.75].forEach((ratio) => {
+    ctx.beginPath();
+    ctx.moveTo(0, h * ratio);
+    ctx.lineTo(w, h * ratio);
+    ctx.stroke();
+  });
+
+  // Plot Skin Temperature (35.0 °C to 37.5 °C) in Amber
+  ctx.strokeStyle = "#fbbf24";
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  for (let i = 0; i < TEMP_BUFFER_LEN; i++) {
+    const x = (i / (TEMP_BUFFER_LEN - 1)) * w;
+    const norm = (tempHistory[i] - 35.0) / 2.5;
+    const y = h - Math.max(0.08, Math.min(0.92, norm)) * h;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Plot HRV RMSSD (5 ms to 65 ms) in Sky Blue
+  ctx.strokeStyle = "#60a5fa";
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  for (let i = 0; i < TEMP_BUFFER_LEN; i++) {
+    const x = (i / (TEMP_BUFFER_LEN - 1)) * w;
+    const norm = (hrvHistory[i] - 5) / 60;
+    const y = h - Math.max(0.08, Math.min(0.92, norm)) * h;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+}
+
+function animationLoop(now) {
+  const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
+  lastFrameTime = now;
+
+  if (activePatient && isStreaming) {
+    // Automatically trigger sudden arrhythmia on Elena after 5 seconds
+    if (activePatient.hasArrhythmiaEvent && !arrhythmiaActive && (now - sessionStartTime) > 5000) {
+      triggerElenaArrhythmia();
+    }
+
+    const state = arrhythmiaActive ? activePatient.arrhythmiaState : activePatient.baseline;
+    // Irregular beat-to-beat jitter during arrhythmia
+    const jitter = arrhythmiaActive ? (Math.sin(now * 0.007) * 14 + (Math.random() - 0.5) * 12) : Math.sin(now * 0.0015) * 1.5;
+    const instantaneousBpm = Math.max(52, Math.round(state.bpm + jitter));
+    const beatsPerSec = instantaneousBpm / 60;
+
+    // Advance oscilloscope samples
+    const samplesToAdvance = Math.max(1, Math.round(dt * 125 * sweepSpeedMultiplier));
+    for (let s = 0; s < samplesToAdvance; s++) {
+      const prevPhase = cardiacPhase;
+      cardiacPhase = (cardiacPhase + (beatsPerSec * dt) / samplesToAdvance) % 1;
+
+      // Detect R-peak crossing around phase 0.28
+      if (prevPhase < 0.28 && cardiacPhase >= 0.28) {
+        lastBeatFlash = now;
+        if (!arrhythmiaActive) playMedicalBeep(false);
+      }
+
+      writeCursor = (writeCursor + 1) % ECG_BUFFER_LEN;
+      ecgHistory[writeCursor] = computeEcgVoltage(cardiacPhase, arrhythmiaActive);
+    }
+
+    // Update vital readouts & secondary trend every ~250ms
+    secondaryTickAccum += dt;
+    if (secondaryTickAccum >= 0.25) {
+      secondaryTickAccum = 0;
+
+      const currentTemp = Number((state.tempC + (Math.random() - 0.5) * 0.06).toFixed(1));
+      const currentHrv = Math.max(8, Math.round(state.hrvMs + (Math.random() - 0.5) * (arrhythmiaActive ? 8 : 3)));
+      tempHistory.push(currentTemp);
+      tempHistory.shift();
+      hrvHistory.push(currentHrv);
+      hrvHistory.shift();
+
+      const bpmEl = document.getElementById("vitalBpm");
+      const rhythmEl = document.getElementById("vitalRhythmLabel");
+      const stEl = document.getElementById("vitalSt");
+      const stLabelEl = document.getElementById("vitalStLabel");
+      const tempEl = document.getElementById("vitalTemp");
+      const tempLabelEl = document.getElementById("vitalTempLabel");
+      const hrvEl = document.getElementById("vitalHrv");
+      const aiLabelEl = document.getElementById("vitalAiLabel");
+
+      bpmEl.innerHTML = `${instantaneousBpm} <small style="font-size:0.95rem;">BPM</small>`;
+      bpmEl.style.color = arrhythmiaActive ? "#ff4d64" : "#36d399";
+      rhythmEl.textContent = arrhythmiaActive ? "Irregular Tachyarrhythmia!" : "Normal Sinus Rhythm";
+
+      stEl.innerHTML = `${state.stMm.toFixed(1)} <small style="font-size:0.95rem;">mm</small>`;
+      stEl.style.color = arrhythmiaActive ? "#ff4d64" : "#60a5fa";
+      stLabelEl.textContent = arrhythmiaActive ? "Silent ST Depression" : "Isoelectric Baseline";
+
+      tempEl.innerHTML = `${currentTemp.toFixed(1)} <small style="font-size:0.95rem;">&deg;C</small>`;
+      tempEl.style.color = arrhythmiaActive ? "#ff8a98" : "#fbbf24";
+      tempLabelEl.textContent = arrhythmiaActive ? "Cool Diaphoresis Drop" : "NTC Thermistor Stable";
+
+      hrvEl.innerHTML = `${currentHrv} <small style="font-size:0.95rem;">ms</small>`;
+      aiLabelEl.textContent = arrhythmiaActive ? "Edge AI: TIER 1 ALERT" : "Edge AI: Tier 0 (Quiet)";
+      aiLabelEl.style.color = arrhythmiaActive ? "#ff4d64" : "#e2e8f0";
+    }
+
+    // Heartbeat icon flash
+    const heartIcon = document.getElementById("beatHeartIcon");
+    if (heartIcon) {
+      const isFlashing = (now - lastBeatFlash) < 140;
+      heartIcon.style.color = arrhythmiaActive ? "#ff4d64" : "#36d399";
+      heartIcon.style.transform = isFlashing ? "scale(1.35)" : "scale(1)";
+      heartIcon.style.display = "inline-block";
+      heartIcon.style.transition = "transform 0.08s ease";
+    }
+
+    drawEcgCanvas();
+    drawTempAndHrvCanvas();
+  }
+
+  requestAnimationFrame(animationLoop);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Patient card selection on login screen
+  document.querySelectorAll("[data-select-patient]").forEach((card) => {
+    card.addEventListener("click", () => updateLoginSelection(card.dataset.selectPatient));
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        updateLoginSelection(card.dataset.selectPatient);
+      }
+    });
+  });
+
+  // Sign in button
+  const signInBtn = document.getElementById("signInDemoBtn");
+  if (signInBtn) {
+    signInBtn.addEventListener("click", () => loadPatientDashboard(selectedPatientKey));
+  }
+
+  // Switch patient button inside dashboard
+  const switchBtn = document.getElementById("switchPatientBtn");
+  if (switchBtn) {
+    switchBtn.addEventListener("click", () => {
+      const nextKey = activePatient && activePatient.key === "javier" ? "elena" : "javier";
+      updateLoginSelection(nextKey);
+      loadPatientDashboard(nextKey);
+    });
+  }
+
+  // Logout button
+  const logoutBtn = document.getElementById("logoutDemoBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      activePatient = null;
+      arrhythmiaActive = false;
+      document.getElementById("dashboardView").style.display = "none";
+      document.getElementById("loginView").style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  // Stream controls
+  const sweepBtn = document.getElementById("toggleSweepBtn");
+  if (sweepBtn) {
+    sweepBtn.addEventListener("click", () => {
+      isStreaming = !isStreaming;
+      sweepBtn.textContent = isStreaming ? "Pause Stream" : "Resume Stream";
+      sweepBtn.classList.toggle("active", isStreaming);
+    });
+  }
+
+  const speedBtn = document.getElementById("toggleSpeedBtn");
+  if (speedBtn) {
+    speedBtn.addEventListener("click", () => {
+      sweepSpeedMultiplier = sweepSpeedMultiplier === 1 ? 2 : 1;
+      speedBtn.textContent = sweepSpeedMultiplier === 1 ? "Speed: 25 mm/s" : "Speed: 50 mm/s";
+    });
+  }
+
+  const audioBtn = document.getElementById("toggleAudioBtn");
+  if (audioBtn) {
+    audioBtn.addEventListener("click", () => {
+      audioEnabled = !audioEnabled;
+      audioBtn.textContent = audioEnabled ? "Audio Alert: On" : "Audio Alert: Off";
+      audioBtn.classList.toggle("active", audioEnabled);
+    });
+  }
+
+  const replayBtn = document.getElementById("replayArrhythmiaBtn");
+  if (replayBtn) {
+    replayBtn.addEventListener("click", () => {
+      arrhythmiaActive = false;
+      arrhythmiaAlertShown = false;
+      sessionStartTime = performance.now() - 3500; // Re-triggers arrhythmia in 1.5s
+      renderStatusBanner();
+    });
+  }
+
+  requestAnimationFrame(animationLoop);
+});

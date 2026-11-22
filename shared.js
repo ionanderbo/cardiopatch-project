@@ -62,15 +62,7 @@ function buildChrome() {
             <span class="eyebrow eyebrow--light">CardioPatch &middot; Menu</span>
             <button class="menu-trigger" id="closeDrawerBtn" aria-label="Close menu">&#10005;</button>
           </div>
-          <ul class="drawer-links">
-            ${drawerItems}
-            <li>
-              <a href="prototype.html" class="btn-wipe" style="border-color:rgba(224,79,95,0.6);">
-                <span>05 &middot; Live Prototype</span>
-                <small style="font-size:0.76rem;opacity:0.82;">Patient login &amp; real-time ECG</small>
-              </a>
-            </li>
-          </ul>
+          <ul class="drawer-links">${drawerItems}</ul>
         </div>
         <p style="font-size:0.82rem;opacity:0.72;border-top:1px solid rgba(255,255,255,0.16);padding-top:16px;">
           ${PROJECT_DATA.meta.tagline}
@@ -83,7 +75,7 @@ function buildChrome() {
   if (footer) {
     footer.innerHTML = `
       <footer class="site-footer">
-        <div style="max-width:640px;">
+        <div style="max-width:660px;">
           <strong style="font-size:1.1rem;">CardioPatch &middot; Group 06</strong>
           <p style="font-size:0.84rem;opacity:0.88;margin-top:6px;">
             Sof&iacute;a Bastero &middot;
