@@ -51,7 +51,7 @@ function buildChrome() {
         </div>
         <ul class="nav-links">${navItems}</ul>
         <div class="topbar-right">
-          ${rollBtn("Live Prototype", "health40.html#prototype", "crimson")}
+          ${rollBtn("Live Prototype", "prototype.html", "crimson")}
         </div>
       </header>
 
@@ -62,7 +62,15 @@ function buildChrome() {
             <span class="eyebrow eyebrow--light">CardioPatch &middot; Menu</span>
             <button class="menu-trigger" id="closeDrawerBtn" aria-label="Close menu">&#10005;</button>
           </div>
-          <ul class="drawer-links">${drawerItems}</ul>
+          <ul class="drawer-links">
+            ${drawerItems}
+            <li>
+              <a href="prototype.html" class="btn-wipe" style="border-color:rgba(224,79,95,0.6);">
+                <span>05 &middot; Live Prototype</span>
+                <small style="font-size:0.76rem;opacity:0.82;">Patient login &amp; real-time ECG</small>
+              </a>
+            </li>
+          </ul>
         </div>
         <p style="font-size:0.82rem;opacity:0.72;border-top:1px solid rgba(255,255,255,0.16);padding-top:16px;">
           ${PROJECT_DATA.meta.tagline}
@@ -90,7 +98,7 @@ function buildChrome() {
           </p>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          ${rollBtn("Why Us?", "why-us.html", "outline")}
+          ${rollBtn("Live Prototype", "prototype.html", "outline")}
           ${rollBtn("Health 4.0", "health40.html", "crimson")}
         </div>
       </footer>

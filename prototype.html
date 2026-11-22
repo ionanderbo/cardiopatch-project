@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Prototype Portal · CardioPatch</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./animations.css" />
+  <style>
+    /* Prototype Portal Specific Styles */
+    .login-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: clamp(24px, 4vw, 56px);
+      align-items: center;
+    }
+
+    .login-card {
+      background: #faf7f4;
+      color: var(--ink-primary);
+      border-radius: 28px;
+      padding: clamp(24px, 3.5vw, 40px);
+      box-shadow: var(--shadow-elevated);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(20, 22, 25, 0.16);
+      background: #ffffff;
+      font-family: var(--font-sans);
+      font-size: 0.96rem;
+      color: var(--ink-primary);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent-crimson);
+      box-shadow: 0 0 0 4px rgba(184, 41, 61, 0.12);
+    }
+
+    .demo-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .demo-chip {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 7px 12px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(184, 41, 61, 0.28);
+      background: rgba(184, 41, 61, 0.07);
+      color: var(--accent-crimson);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .demo-chip:hover {
+      background: var(--accent-crimson);
+      color: #ffffff;
+    }
+
+    /* Dashboard Metrics & Monitor */
+    .dash-topbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid rgba(250, 247, 244, 0.16);
+      margin-bottom: 24px;
+    }
+
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .kpi-box {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 20px;
+      padding: 18px 20px;
+    }
+
+    .kpi-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.74;
+    }
+
+    .kpi-value {
+      font-size: 1.85rem;
+      font-weight: 800;
+      margin-top: 4px;
+      letter-spacing: -0.03em;
+    }
+
+    .kpi-sub {
+      font-size: 0.8rem;
+      opacity: 0.78;
+      margin-top: 2px;
+    }
+
+    .monitor-shell {
+      background: #0e1114;
+      color: #faf7f4;
+      border-radius: 26px;
+      padding: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .monitor-controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .canvas-stage {
+      position: relative;
+      width: 100%;
+      height: 230px;
+      border-radius: 18px;
+      background: #13171c;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .canvas-stage--secondary {
+      height: 125px;
+      margin-top: 12px;
+    }
+
+    .canvas-stage canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .canvas-tag {
+      position: absolute;
+      top: 10px;
+      left: 14px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      background: rgba(14, 17, 20, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #e6ebf0;
+      pointer-events: none;
+    }
+
+    .beat-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #2bb673;
+      margin-right: 6px;
+      transition: transform 0.1s ease;
+    }
+
+    .beat-dot.pulse {
+      transform: scale(1.65);
+    }
+
+    .mode-pill {
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.06);
+      color: #faf7f4;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mode-pill.active {
+      background: var(--accent-crimson);
+      border-color: var(--accent-crimson);
+      color: #ffffff;
+    }
+
+    .escalation-step {
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border-subtle);
+      background: #ffffff;
+      transition: all 0.25s ease;
+    }
+
+    .escalation-step.triggered {
+      border-color: var(--accent-crimson);
+      background: #fff3f5;
+      box-shadow: 0 8px 24px rgba(184, 41, 61, 0.12);
+    }
+
+    .spec-list {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .spec-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.9rem;
+    }
+
+    .spec-list li span:first-child {
+      color: var(--ink-secondary);
+      font-weight: 600;
+    }
+
+    .spec-list li span:last-child {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .strip-modal {
+      margin-top: 14px;
+      padding: 14px 18px;
+      border-radius: 16px;
+      background: rgba(36, 106, 89, 0.18);
+      border: 1px solid rgba(43, 182, 115, 0.45);
+      font-size: 0.86rem;
+      display: none;
+    }
+
+    @media (max-width: 920px) {
+      .login-grid, .kpi-strip {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <div id="site-header"></div>
+
+    <!-- =====================================================================
+         VIEW 1: PATIENT / FAMILY LOGIN GATE
+         ===================================================================== -->
+    <section class="band band--crimson" id="loginGateView">
+      <div class="radial-rings"></div>
+      <div class="login-grid" style="position:relative;z-index:2;">
+        <div>
+          <span class="eyebrow eyebrow--light">CardioPatch Cloud Portal &middot; Demo Access</span>
+          <h1 class="display-hero" style="margin-top:16px;">
+            Monitorización cardíaca <span class="serif-italic">en vivo</span> y segura.
+          </h1>
+          <p style="margin-top:16px;font-size:1.05rem;opacity:0.92;max-width:520px;">
+            Inicia sesión con un perfil de paciente de prueba para visualizar sus ondas ECG y temperatura cutánea en tiempo real, su historial clínico, el contacto de su cuidador familiar y las especificaciones técnicas del parche.
+          </p>
+
+          <div style="margin-top:24px;display:grid;gap:10px;max-width:480px;font-size:0.9rem;opacity:0.9;">
+            <div>&#10003; <strong>Cifrado Extremo a Extremo:</strong> TLS 1.3 en tránsito + AES-256 en reposo (GDPR UE).</div>
+            <div>&#10003; <strong>Acceso Basado en Roles (RBAC):</strong> Vista accesible D4ALL para paciente/familia y telemetría clínica.</div>
+          </div>
+        </div>
+
+        <div class="login-card">
+          <span class="badge badge--alert">Acceso de Prueba &middot; Prototipo</span>
+          <h2 style="margin-top:10px;font-size:1.65rem;">Iniciar Sesión</h2>
+          <p style="font-size:0.88rem;color:var(--ink-secondary);margin-top:4px;margin-bottom:16px;">
+            Usa el perfil preconfigurado del estudio o introduce cualquier paciente de prueba:
+          </p>
+
+          <div class="demo-presets">
+            <button type="button" class="demo-chip" id="fillJavierBtn">
+              Cargar: Javier Mendizabal (68 años)
+            </button>
+            <button type="button" class="demo-chip" id="fillCustomBtn">
+              Cargar: Paciente Rural Prueba
+            </button>
+          </div>
+
+          <form id="prototypeLoginForm">
+            <div class="form-group">
+              <label class="form-label" for="loginPatientName">Nombre del Paciente</label>
+              <input class="form-input" type="text" id="loginPatientName" value="Javier Mendizabal" required />
+            </div>
+
+            <div class="grid-2" style="gap:12px;">
+              <div class="form-group">
+                <label class="form-label" for="loginPatientAge">Edad</label>
+                <input class="form-input" type="number" id="loginPatientAge" value="68" min="18" max="110" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="loginPatientId">ID Dispositivo</label>
+                <input class="form-input" type="text" id="loginPatientId" value="CP-2026-068" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="loginEmail">Correo Electrónico</label>
+              <input class="form-input" type="email" id="loginEmail" value="javier.mendizabal@cardiopatch.eu" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="loginPass">Contraseña</label>
+              <input class="form-input" type="password" id="loginPass" value="cardiopatch2026" required />
+            </div>
+
+            <button type="submit" class="btn-roll btn-roll--crimson btn-wipe" style="width:100%;margin-top:6px;">
+              <span class="roll-track">
+                <span>Acceder al Panel en Tiempo Real</span>
+                <span>Entrar al Monitor &rarr;</span>
+              </span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         VIEW 2: AUTHENTICATED REAL-TIME PATIENT & CLINICAL DASHBOARD
+         ===================================================================== -->
+    <div id="authenticatedDashboard" style="display:none;flex-direction:column;gap:18px;">
+
+      <!-- Band A: Patient Header + Live KPIs + Real-Time Waveforms -->
+      <section class="band band--obsidian">
+        <div class="dash-topbar">
+          <div>
+            <span class="eyebrow eyebrow--light" id="dashPatientBadge">Paciente Activo &middot; ID CP-2026-068</span>
+            <h1 style="font-size:clamp(1.7rem,3vw,2.5rem);margin-top:10px;" id="dashPatientTitle">
+              Javier Mendizabal &middot; 68 años
+            </h1>
+            <p style="font-size:0.9rem;opacity:0.78;margin-top:4px;" id="dashPatientSub">
+              Zona Rural (Bizkaia) &middot; Parche Activo IP65 &middot; Sincronizado vía BLE 5.0 con Cloud UE
+            </p>
+          </div>
+
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <span class="badge badge--yes" id="d4allCalmBanner" style="font-size:0.82rem;padding:8px 14px;">
+              Sistema Activo &mdash; Ritmo Cardíaco Estable
+            </span>
+            <button type="button" class="mode-pill" id="logoutDemoBtn">
+              Cerrar Sesión / Cambiar Paciente
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Live Telemetry KPIs -->
+        <div class="kpi-strip" style="margin-bottom:22px;">
+          <div class="kpi-box">
+            <div class="kpi-label"><span class="beat-dot" id="liveBeatDot"></span>Frecuencia Cardíaca</div>
+            <div class="kpi-value" id="kpiBpm">68 <small style="font-size:1rem;font-weight:600;">BPM</small></div>
+            <div class="kpi-sub" id="kpiHrv">HRV (RMSSD): 44 ms &middot; Regular</div>
+          </div>
+
+          <div class="kpi-box">
+            <div class="kpi-label">Temperatura Cutánea</div>
+            <div class="kpi-value" id="kpiTemp">36.6 <small style="font-size:1rem;font-weight:600;">&deg;C</small></div>
+            <div class="kpi-sub" id="kpiTempTrend">Estable (&Delta; 0.0 &deg;C / 15 min)</div>
+          </div>
+
+          <div class="kpi-box">
+            <div class="kpi-label">Segmento ST &amp; Edge AI</div>
+            <div class="kpi-value" id="kpiSt">0.0 <small style="font-size:1rem;font-weight:600;">mm</small></div>
+            <div class="kpi-sub" id="kpiAiTier">TinyML Tier 0 &middot; Sin anomalías</div>
+          </div>
+
+          <div class="kpi-box">
+            <div class="kpi-label">Estado del Parche</div>
+            <div class="kpi-value">88<small style="font-size:1rem;font-weight:600;">%</small></div>
+            <div class="kpi-sub">BLE 5.0 OK &middot; Caché 24h lista</div>
+          </div>
+        </div>
+
+        <!-- Real-Time Dual Waveform Monitor -->
+        <div class="monitor-shell">
+          <div class="monitor-controls">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <button type="button" class="play-circle" id="rtPlayPauseBtn" aria-label="Pausar o reanudar">&#10074;&#10074;</button>
+              <button type="button" class="mode-pill active" data-rt-mode="normal">1. Reposo Normal (68 BPM)</button>
+              <button type="button" class="mode-pill" data-rt-mode="stairs">2. Subiendo Escaleras (116 BPM)</button>
+              <button type="button" class="mode-pill" data-rt-mode="ischemia">3. Isquemia Silente (ST -1.6 mm)</button>
+              <button type="button" class="mode-pill" data-rt-mode="noise">4. Filtro Ruido Movimiento</button>
+            </div>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button type="button" class="mode-pill" id="toggleGridBtn">Cuadrícula: ON</button>
+              <button type="button" class="mode-pill" id="captureStripBtn" style="border-color:#2bb673;color:#7ef2b6;">
+                Capturar Tira ECG 30s
+              </button>
+            </div>
+          </div>
+
+          <!-- Primary ECG Canvas -->
+          <div class="canvas-stage">
+            <span class="canvas-tag" id="ecgChannelTag">CH1 &middot; ECG MONOCANAL (250 Hz &middot; Filtro 0.5&ndash;40 Hz) &middot; Derivación I</span>
+            <canvas id="rtEcgCanvas"></canvas>
+          </div>
+
+          <!-- Secondary Real-Time Heart Rate & Skin Temp Trend Canvas -->
+          <div class="canvas-stage canvas-stage--secondary">
+            <span class="canvas-tag" id="secondaryChannelTag">CH2 &middot; TENDENCIA EN VIVO: FRECUENCIA CARDÍACA (BPM) Y TEMPERATURA CUTÁNEA (&deg;C)</span>
+            <canvas id="rtTrendCanvas"></canvas>
+          </div>
+
+          <div class="strip-modal" id="capturedStripNotice"></div>
+        </div>
+      </section>
+
+      <!-- Band B: Clinical History + Family Caregiver & 3-Step Alert Tree -->
+      <section class="band band--alabaster">
+        <div class="grid-2">
+          <!-- Card 1: Historial Clínico del Paciente -->
+          <article class="card">
+            <span class="badge badge--alert">Historial Clínico &middot; EHR / HL7 FHIR</span>
+            <h2 style="margin-top:12px;font-size:1.5rem;">Antecedentes y Perfil Médico</h2>
+            <p style="font-size:0.9rem;color:var(--ink-secondary);margin-top:6px;">
+              Datos clínicos sincronizados con la unidad de cardiología para contextualizar las alertas de la IA:
+            </p>
+
+            <ul class="spec-list" id="clinicalHistoryList">
+              <li><span>Paciente</span><span id="histName">Javier Mendizabal (68 años)</span></li>
+              <li><span>Antecedente Principal</span><span>IAM previo (2024) + Hipertensión</span></li>
+              <li><span>Factor de Riesgo</span><span>Isquemia silente sin dolor torácico</span></li>
+              <li><span>Implantes Cardíacos</span><span>Ninguno (Apto &middot; Sin marcapasos)</span></li>
+              <li><span>Tolerancia Cutánea</span><span>Apto &middot; Silicona hipoalergénica</span></li>
+              <li><span>Cardiólogo Asignado</span><span>Dr. Jon Azpeitia (Cardiología)</span></li>
+              <li><span>Enfermería Seguimiento</span><span>Mikel Unanue (Rehab. Cardíaca)</span></li>
+            </ul>
+          </article>
+
+          <!-- Card 2: Historial / Contacto Familiar & Escalado de Alertas -->
+          <article class="card">
+            <span class="badge badge--yes">Red Familiar &middot; Árbol de Escalado</span>
+            <h2 style="margin-top:12px;font-size:1.5rem;">Cuidador Familiar y Protocolo de Aviso</h2>
+            <p style="font-size:0.9rem;color:var(--ink-secondary);margin-top:6px;">
+              <strong>Cuidadora designada:</strong> Carmen Mendizabal (Hija &middot; Contacto de emergencia verificado).
+            </p>
+
+            <div style="display:grid;gap:10px;margin-top:14px;" id="escalationLadder">
+              <div class="escalation-step" id="escStep1">
+                <strong>Paso 1 (0&ndash;30 s) &middot; Comprobación tranquila al paciente</strong>
+                <p style="font-size:0.84rem;color:var(--ink-secondary);margin-top:3px;">
+                  Vibración suave en el móvil de <span class="dyn-patient-short">Javier</span> sin luces rojas alarmantes para evitar picos de tensión arterial.
+                </p>
+              </div>
+              <div class="escalation-step" id="escStep2">
+                <strong>Paso 2 (30&ndash;90 s) &middot; Aviso prioritario a Carmen Mendizabal</strong>
+                <p style="font-size:0.84rem;color:var(--ink-secondary);margin-top:3px;">
+                  Si el paciente no responde o indica malestar, la app de Carmen recibe alerta sonora y ubicación.
+                </p>
+              </div>
+              <div class="escalation-step" id="escStep3">
+                <strong>Paso 3 (&gt;90 s) &middot; Triaje Clínico (Dr. Jon Azpeitia / 112)</strong>
+                <p style="font-size:0.84rem;color:var(--ink-secondary);margin-top:3px;">
+                  Envío cifrado de tira ECG de 30 s previa y posterior al evento junto con temperatura cutánea.
+                </p>
+              </div>
+            </div>
+
+            <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+              <button type="button" class="demo-chip" id="simulateEscalationBtn">
+                Simular Cadena de Escalado (1 &rarr; 2 &rarr; 3)
+              </button>
+              <button type="button" class="demo-chip" id="resetEscalationBtn" style="border-color:var(--border-subtle);color:var(--ink-secondary);background:#fff;">
+                Restablecer Estado Normal
+              </button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Band C: Características Técnicas del Dispositivo (Annex C & Table 5) -->
+      <section class="band band--sand">
+        <span class="eyebrow">Especificaciones del Hardware y Cloud &middot; CardioPatch v1.0</span>
+        <h2 class="display-section" style="margin:12px 0 22px;">Características Técnicas del Dispositivo</h2>
+
+        <div class="grid-3">
+          <article class="card">
+            <span class="badge badge--alert">01 &middot; Sensores y Hardware</span>
+            <h3 style="margin-top:12px;">Adquisición Biomédica</h3>
+            <ul class="spec-list">
+              <li><span>Front-End ECG</span><span>AD8232 / MAX30003</span></li>
+              <li><span>Frecuencia Muestreo</span><span>250 Hz (1 canal)</span></li>
+              <li><span>Sensor Térmico</span><span>Termistor NTC (&plusmn;0.1 &deg;C)</span></li>
+              <li><span>Protección Carcasa</span><span>IP65 (Impresión 3D)</span></li>
+              <li><span>Adhesivo</span><span>Silicona hipoalergénica</span></li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <span class="badge badge--alert">02 &middot; Edge AI &amp; Procesado</span>
+            <h3 style="margin-top:12px;">Inteligencia en el Parche</h3>
+            <ul class="spec-list">
+              <li><span>Filtrado Digital</span><span>Paso banda 0.5&ndash;40 Hz</span></li>
+              <li><span>Detección Latidos</span><span>Pan-Tompkins (Picos R)</span></li>
+              <li><span>Modelo IA</span><span>TinyML micro-red neuronal</span></li>
+              <li><span>Clasificación</span><span>2 niveles (Evita fatiga)</span></li>
+              <li><span>Buffer Offline</span><span>24 horas en memoria flash</span></li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <span class="badge badge--alert">03 &middot; IoT &amp; Ciberseguridad</span>
+            <h3 style="margin-top:12px;">Conectividad y Privacidad</h3>
+            <ul class="spec-list">
+              <li><span>Enlace Inalámbrico</span><span>Bluetooth Low Energy 5.0</span></li>
+              <li><span>Cifrado Transporte</span><span>TLS 1.3 (HTTPS)</span></li>
+              <li><span>Cifrado Almacenado</span><span>AES-256 (Servidores UE)</span></li>
+              <li><span>Control Acceso</span><span>OAuth 2.0 + RBAC</span></li>
+              <li><span>Interoperabilidad</span><span>HL7 FHIR &middot; GDPR UE</span></li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+    </div>
+
+    <div id="site-footer"></div>
+  </div>
+
+  <script src="./data.js"></script>
+  <script src="./shared.js"></script>
+  <script src="./prototype.js"></script>
+</body>
+</html>
