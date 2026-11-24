@@ -78,9 +78,7 @@ function buildChrome() {
         <div style="max-width:660px;">
           <strong style="font-size:1.1rem;">CardioPatch &middot; Group 06</strong>
           <p style="font-size:0.84rem;opacity:0.88;margin-top:6px;">
-            Sof&iacute;a Bastero &middot;
-            <a href="https://ionanderbo.vercel.app" target="_blank" rel="noopener noreferrer" style="color:#faf7f4;text-decoration:underline;text-underline-offset:3px;font-weight:600;">Ion Ander Bolado</a> &middot;
-            Paula de Saja &middot; Uxue San Juan
+            Sof&iacute;a Bastero &middot; Ion Ander Bolado &middot; Paula de Saja &middot; Uxue San Juan
           </p>
           <p style="font-size:0.78rem;opacity:0.7;margin-top:3px;">
             Introduction to Biomedical Engineering (2026&ndash;2027) &middot; University of Deusto
